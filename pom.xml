@@ -44,6 +44,14 @@
       <version>${flink.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-table-planner -->
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-table-planner_2.12</artifactId>
+      <version>${flink.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
     <!-- FileSystem connector -->
     <dependency>
       <groupId>org.apache.flink</groupId>
@@ -51,11 +59,11 @@
       <version>${flink.version}</version>
     </dependency>
 
-    <!-- CSV format support -->
+<!--    &lt;!&ndash; CSV format support &ndash;&gt;-->
     <dependency>
-      <groupId>org.apache.flink</groupId>
-      <artifactId>flink-csv</artifactId>
-      <version>${flink.version}</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>1.10.0</version>
     </dependency>
 
     <!-- Required to run jobs locally from a main() method -->
@@ -72,6 +80,12 @@
       <version>1.7.36</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.30</version>
+      <scope>provided</scope>
+    </dependency>
 
   </dependencies>
 
