@@ -3,25 +3,15 @@ package com.spotify.flink;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.DataTypes;
-import org.apache.flink.table.api.Schema;
-import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.util.Collector;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static org.apache.flink.table.api.Expressions.$;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -45,34 +35,7 @@ public class Main {
                             String snapshotDate = record.get(7).trim();
 
                             if (country.equalsIgnoreCase("RO") && dailyRank <= 10 && snapshotDate.equals("2025-05-09")) {
-                                SongRecord song = new SongRecord(
-                                        record.get(0).trim(),                       // spotifyId
-                                        record.get(1).trim(),                       // name
-                                        record.get(2).trim(),                       // artists
-                                        dailyRank,                                  // dailyRank
-                                        Integer.parseInt(record.get(4).trim()),     // dailyMovement
-                                        Integer.parseInt(record.get(5).trim()),     // weeklyMovement
-                                        country,                                    // country
-                                        snapshotDate,                               // snapshotDate
-                                        Integer.parseInt(record.get(8).trim()),     // popularity
-                                        Boolean.parseBoolean(record.get(9).trim()), // isExplicit
-                                        Integer.parseInt(record.get(10).trim()),    // durationMs
-                                        record.get(11).trim(),                      // albumName
-                                        record.get(12).trim(),                      // albumReleaseDate
-                                        Float.parseFloat(record.get(13).trim()),    // danceability
-                                        Float.parseFloat(record.get(14).trim()),    // energy
-                                        Integer.parseInt(record.get(15).trim()),    // key
-                                        Float.parseFloat(record.get(16).trim()),    // loudness
-                                        Integer.parseInt(record.get(17).trim()),    // mode
-                                        Float.parseFloat(record.get(18).trim()),    // speechiness
-                                        Float.parseFloat(record.get(19).trim()),    // acousticness
-                                        Float.parseFloat(record.get(20).trim()),    // instrumentalness
-                                        Float.parseFloat(record.get(21).trim()),    // liveness
-                                        Float.parseFloat(record.get(22).trim()),    // valence
-                                        Float.parseFloat(record.get(23).trim()),    // tempo
-                                        Integer.parseInt(record.get(24).trim())     // timeSignature
-                                );
-
+                                SongRecord song = parseSong(record);
                                 out.collect(song);
                             }
                         }
@@ -86,5 +49,35 @@ public class Main {
         System.out.println("Starting Flink job...");
         env.execute("Top 10 Romania Songs - Flink Job");
         System.out.println("Flink job finished.");
+    }
+
+    private static SongRecord parseSong(CSVRecord record) {
+        return new SongRecord(
+                record.get(0).trim(),                       // spotifyId
+                record.get(1).trim(),                       // name
+                record.get(2).trim(),                       // artists
+                Integer.parseInt(record.get(3).trim()),     // dailyRank
+                Integer.parseInt(record.get(4).trim()),     // dailyMovement
+                Integer.parseInt(record.get(5).trim()),     // weeklyMovement
+                record.get(6).trim(),                       // country
+                record.get(7).trim(),                       // snapshotDate
+                Integer.parseInt(record.get(8).trim()),     // popularity
+                Boolean.parseBoolean(record.get(9).trim()), // isExplicit
+                Integer.parseInt(record.get(10).trim()),    // durationMs
+                record.get(11).trim(),                      // albumName
+                record.get(12).trim(),                      // albumReleaseDate
+                Float.parseFloat(record.get(13).trim()),    // danceability
+                Float.parseFloat(record.get(14).trim()),    // energy
+                Integer.parseInt(record.get(15).trim()),    // key
+                Float.parseFloat(record.get(16).trim()),    // loudness
+                Integer.parseInt(record.get(17).trim()),    // mode
+                Float.parseFloat(record.get(18).trim()),    // speechiness
+                Float.parseFloat(record.get(19).trim()),    // acousticness
+                Float.parseFloat(record.get(20).trim()),    // instrumentalness
+                Float.parseFloat(record.get(21).trim()),    // liveness
+                Float.parseFloat(record.get(22).trim()),    // valence
+                Float.parseFloat(record.get(23).trim()),    // tempo
+                Integer.parseInt(record.get(24).trim())     // timeSignature
+        );
     }
 }
