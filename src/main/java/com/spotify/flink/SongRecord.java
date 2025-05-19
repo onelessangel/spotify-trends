@@ -2,6 +2,8 @@ package com.spotify.flink;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -9,17 +11,17 @@ import lombok.*;
 public class SongRecord {
     private String spotifyId;
     private String name;
-    private String artists;
+//    private String artists;
     private int dailyRank;
-    private int dailyMovement;
-    private int weeklyMovement;
+//    private int dailyMovement;
+//    private int weeklyMovement;
     private String country;
-    private String snapshotDate;
-    private int popularity;
+    private LocalDate snapshotDate;
+//    private int popularity;
     private boolean isExplicit;
     private int durationMs;
-    private String albumName;
-    private String albumReleaseDate;
+//    private String albumName;
+//    private String albumReleaseDate;
     private float danceability;
     private float energy;
     private int key;
@@ -35,6 +37,6 @@ public class SongRecord {
 
     @Override
     public String toString() {
-        return String.format("%s - %s | Daily position: %d | %s (%s)", artists, name, dailyRank, country, snapshotDate);
+        return String.format("%s | Daily position: %d | %s (%s)", name, dailyRank, country, snapshotDate);
     }
 }
