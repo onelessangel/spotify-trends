@@ -3,6 +3,8 @@ package com.spotify.flink;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.accumulators.LongCounter;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -10,104 +12,191 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.Collector;
 
+import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class Main {
-    private static final AtomicInteger rawCount = new AtomicInteger();
-    private static final AtomicInteger validCount = new AtomicInteger();
-    private static final AtomicInteger parsedCount = new AtomicInteger();
-    private static final AtomicInteger deduplicatedCount = new AtomicInteger();
+
+    private static final String VALID_RECORDS = "validRecords";
+    private static final String PARSED_RECORDS = "parsedRecords";
+    private static final String DEDUPLICATED_RECORDS = "deduplicatedRecords";
 
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        // env.setParallelism(1);
 
         DataStream<SongRecord> cleanedData = loadAndCleanSongs(env, "songs.csv");
 
         cleanedData.print();
 
+        // Ensure that the entire stream is consumed and run to completion.
+        // This is crucial for metrics to be properly aggregated and available
+        // via JobExecutionResult.getAccumulatorResult() after the job finishes
+        cleanedData.addSink(new DiscardingSink<>());
+
         System.out.println("Starting Flink job...");
-        env.execute("All Songs - Clean and Log Job");
+        JobExecutionResult result = env.execute("All Songs - Clean and Deduplicate Job with Metrics");
         System.out.println("Flink job finished.");
+
+        Long validCountLong = result.getAccumulatorResult(VALID_RECORDS);
+        Long parsedCountLong = result.getAccumulatorResult(PARSED_RECORDS);
+        Long deduplicatedCountLong = result.getAccumulatorResult(DEDUPLICATED_RECORDS);
+
+        long validCount = (validCountLong != null) ? validCountLong : 0L;
+        long parsedCount = (parsedCountLong != null) ? parsedCountLong : 0L;
+        long deduplicatedCount = (deduplicatedCountLong != null) ? deduplicatedCountLong : 0L;
+
+        System.out.println("\n--- Final Aggregated Counts ---");
+        System.out.println("Valid records (non-empty fields): " + validCount);
+        System.out.println("Parsed records: " + parsedCount);
+        System.out.println("Deduplicated records: " + deduplicatedCount);
+        System.out.println("-------------------------------\n");
     }
 
-    private static DataStream<SongRecord> loadAndCleanSongs(StreamExecutionEnvironment env, String resourceName){
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream(resourceName))
-        ));
+    /**
+     * Loads song data from a CSV file, parses it into SongRecord objects,
+     * and deduplicates records based on spotifyId.
+     *
+     * @param env The Flink StreamExecutionEnvironment.
+     * @param resourceName The CSV file containing song data.
+     * @return A DataStream of deduplicated SongRecord objects.
+     */
+    private static DataStream<SongRecord> loadAndCleanSongs(final StreamExecutionEnvironment env, final String resourceName) {
+        // Handle reading the file in a streaming and distributed style,
+        // avoiding OutOfMemoryError for large files by not loading the entire content into driver memory
+//        DataStream<String> rawData = env.readTextFile(resourceName); // songs.csv needs to be defined at the same level as pom.xml
 
-        List<String> lines = reader.lines().collect(Collectors.toList());
-        rawCount.set(lines.size());
+        // Read from the classpath
+        DataStream<String> rawData = env.addSource(new SourceFunction<String>() {
+            private volatile boolean isRunning = true;
 
-        DataStream<String> rawData = env.fromCollection(lines);
+            @Override
+            public void run(SourceContext<String> ctx) throws Exception {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream(resourceName))
+                ))) {
+                    String line;
+                    boolean isFirstLine = true;
+                    while (isRunning && (line = reader.readLine()) != null) {
+                        if (isFirstLine) {
+                            isFirstLine = false;
+                            continue; // Skip header
+                        }
+                        ctx.collect(line);
+                    }
+                }
+            }
 
+            @Override
+            public void cancel() {
+                isRunning = false;
+            }
+        });
+
+        // Parse each line of the CSV into SongRecord objects
         DataStream<SongRecord> parsed = rawData
                 .flatMap(new RichFlatMapFunction<String, SongRecord>() {
+                    // Counter (Flink's Metric system) - for proper distributed counting
+                    private transient LongCounter validRecordsCounter;
+                    private transient LongCounter parsedRecordsCounter;
+
+                    // Initialize the counters
+                    @Override
+                    public void open(Configuration parameters) {
+                        validRecordsCounter = new LongCounter();
+                        parsedRecordsCounter = new LongCounter();
+
+                        getRuntimeContext().addAccumulator(VALID_RECORDS, validRecordsCounter);
+                        getRuntimeContext().addAccumulator(PARSED_RECORDS, parsedRecordsCounter);
+                    }
+
                     @Override
                     public void flatMap(String line, Collector<SongRecord> out) {
                         try {
                             CSVParser parser = CSVParser.parse(line, CSVFormat.DEFAULT.withQuote('"'));
                             for (CSVRecord record : parser) {
+                                // Check if any field in the current record is null or blank
                                 if (record.stream().anyMatch(s -> s == null || s.isBlank())) return;
 
-                                validCount.incrementAndGet();
+                                validRecordsCounter.add(1);
 
+                                // Parse the CSV record into a SongRecord object
                                 SongRecord song = parseSong(record);
                                 if (song != null) {
-                                    parsedCount.incrementAndGet();
+                                    parsedRecordsCounter.add(1);
+
                                     out.collect(song);
                                 }
                             }
+                        } catch (IOException e) {
+                            System.err.println("Error parsing CSV line: '" + line + "' - " + e.getMessage());
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            System.err.println("Unexpected error in flatMap for line: '" + line + "' - " + e.getMessage());
                         }
                     }
                 })
                 .returns(SongRecord.class);
 
+        // Deduplicate records based on spotifyId using Flink's Keyed State
         return parsed
                 .keyBy(SongRecord::getSpotifyId)
                 .filter(new RichFilterFunction<>() {
+                    // Keep track of whether a spotifyId has been seen before
                     private transient ValueState<Boolean> seen;
+
+                    private transient LongCounter deduplicatedRecordsCounter;
 
                     @Override
                     public void open(Configuration parameters) {
                         ValueStateDescriptor<Boolean> desc = new ValueStateDescriptor<>("seen", Boolean.class, false);
                         seen = getRuntimeContext().getState(desc);
+
+                        deduplicatedRecordsCounter = new LongCounter();
+                        getRuntimeContext().addAccumulator(DEDUPLICATED_RECORDS, deduplicatedRecordsCounter);
                     }
 
                     @Override
                     public boolean filter(SongRecord value) throws Exception {
                         if (!seen.value()) {
                             seen.update(true);
-                            int count = deduplicatedCount.incrementAndGet();
-                            if (count % 100 == 0) {
-                                System.out.println("Deduplicated count so far: " + count);
-                            }
+
+                            deduplicatedRecordsCounter.add(1);
+
+                            // Keep this record
                             return true;
                         }
+
+                        // Filter out this record (duplicate spotifyId)
                         return false;
                     }
-                })
-                .map(song -> {
-                    if (deduplicatedCount.get() == 1) {
-                        System.out.println("Valid rows (non-empty): " + validCount.get());
-                        System.out.println("Parsed records: " + parsedCount.get());
-                    }
-                    return song;
                 });
     }
 
+    /**
+     * Parses a single CSVRecord into a SongRecord object.
+     *
+     * @param record The CSVRecord to parse.
+     * @return A SongRecord object if parsing is successful, null otherwise.
+     */
     private static SongRecord parseSong(CSVRecord record) {
         try {
+            // Ensure the record has enough columns before attempting to access them
+            if (record.size() < 25) {
+                System.err.println("Record has too few columns. Expected 25, got " + record.size() + ". Record: " + record.toString());
+                return null;
+            }
+
             String snapshotDateStr = record.get(7).trim();
+
             if (snapshotDateStr.isEmpty()) return null;
 
             LocalDate snapshotDate = LocalDate.parse(snapshotDateStr);

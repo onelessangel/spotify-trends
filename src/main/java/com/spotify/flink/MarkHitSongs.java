@@ -99,66 +99,63 @@ public class MarkHitSongs {
 
         // Parse CSV lines into SongRecord objects
         DataStream<SpotifySongRecord> songStream = inputStream
-                .map(new MapFunction<String, SpotifySongRecord>() {
-                    @Override
-                    public SpotifySongRecord map(String line) throws Exception {
-                        try (CSVParser parser = CSVParser.parse(new StringReader(line), 
-                                CSVFormat.DEFAULT.withQuote('"').withIgnoreSurroundingSpaces(true))) {
-                            CSVRecord record = parser.getRecords().get(0);
-                            
-                            SpotifySongRecord songRecord = new SpotifySongRecord();
-                            songRecord.setSpotifyId(record.get(0).trim());
-                            songRecord.setName(record.get(1).trim());
-                            songRecord.setArtists(record.get(2).trim());
-                            songRecord.setDailyRank(Integer.parseInt(record.get(3).trim()));
-                            songRecord.setCountry(record.get(6).trim());
+                .map((MapFunction<String, SpotifySongRecord>) line -> {
+                    try (CSVParser parser = CSVParser.parse(new StringReader(line),
+                            CSVFormat.DEFAULT.withQuote('"').withIgnoreSurroundingSpaces(true))) {
+                        CSVRecord record = parser.getRecords().get(0);
 
-                            String snapshotDateStr = record.get(7).trim();
-                            // Skip records with empty dates
-                            if (snapshotDateStr.isEmpty()) {
-                                return null; // Skip records with empty dates
-                            }
-                            // Skip records with invalid dat
-                            try {
-                                songRecord.setSnapshotDate(LocalDate.parse(snapshotDateStr, DATE_FORMATTER));
-                            } catch (DateTimeParseException e) {
-                                return null;
-                            }
-                            
-                            songRecord.setPopularity(Integer.parseInt(record.get(8).trim()));
-                            songRecord.setExplicit(Boolean.parseBoolean(record.get(9).trim()));
-                            songRecord.setDurationMs(Long.parseLong(record.get(10).trim()));
-                            songRecord.setAlbumName(record.get(11).trim());
-                            
-                            // Handle album release date with validation
-                            String albumDateStr = record.get(12).trim();
-                            if (!albumDateStr.isEmpty()) {
-                                // Set to null if invalid, but don't skip the record
-                                try {
-                                    songRecord.setAlbumReleaseDate(LocalDate.parse(albumDateStr, DATE_FORMATTER));
-                                } catch (DateTimeParseException e) {
-                                    songRecord.setAlbumReleaseDate(null);
-                                }
-                            }
-                            
-                            songRecord.setDanceability(Double.parseDouble(record.get(13).trim()));
-                            songRecord.setEnergy(Double.parseDouble(record.get(14).trim()));
-                            songRecord.setKey(Integer.parseInt(record.get(15).trim()));
-                            songRecord.setLoudness(Double.parseDouble(record.get(16).trim()));
-                            songRecord.setMode(Integer.parseInt(record.get(17).trim()));
-                            songRecord.setSpeechiness(Double.parseDouble(record.get(18).trim()));
-                            songRecord.setAcousticness(Double.parseDouble(record.get(19).trim()));
-                            songRecord.setInstrumentalness(Double.parseDouble(record.get(20).trim()));
-                            songRecord.setLiveness(Double.parseDouble(record.get(21).trim()));
-                            songRecord.setValence(Double.parseDouble(record.get(22).trim()));
-                            songRecord.setTempo(Double.parseDouble(record.get(23).trim()));
-                            songRecord.setTimeSignature(Integer.parseInt(record.get(24).trim()));
-                            
-                            return songRecord;
+                        SpotifySongRecord songRecord = new SpotifySongRecord();
+                        songRecord.setSpotifyId(record.get(0).trim());
+                        songRecord.setName(record.get(1).trim());
+                        songRecord.setArtists(record.get(2).trim());
+                        songRecord.setDailyRank(Integer.parseInt(record.get(3).trim()));
+                        songRecord.setCountry(record.get(6).trim());
+
+                        String snapshotDateStr = record.get(7).trim();
+                        // Skip records with empty dates
+                        if (snapshotDateStr.isEmpty()) {
+                            return null; // Skip records with empty dates
                         }
+                        // Skip records with invalid data
+                        try {
+                            songRecord.setSnapshotDate(LocalDate.parse(snapshotDateStr, DATE_FORMATTER));
+                        } catch (DateTimeParseException e) {
+                            return null;
+                        }
+
+                        songRecord.setPopularity(Integer.parseInt(record.get(8).trim()));
+                        songRecord.setExplicit(Boolean.parseBoolean(record.get(9).trim()));
+                        songRecord.setDurationMs(Long.parseLong(record.get(10).trim()));
+                        songRecord.setAlbumName(record.get(11).trim());
+
+                        // Handle album release date with validation
+                        String albumDateStr = record.get(12).trim();
+                        if (!albumDateStr.isEmpty()) {
+                            // Set to null if invalid, but don't skip the record
+                            try {
+                                songRecord.setAlbumReleaseDate(LocalDate.parse(albumDateStr, DATE_FORMATTER));
+                            } catch (DateTimeParseException e) {
+                                songRecord.setAlbumReleaseDate(null);
+                            }
+                        }
+
+                        songRecord.setDanceability(Double.parseDouble(record.get(13).trim()));
+                        songRecord.setEnergy(Double.parseDouble(record.get(14).trim()));
+                        songRecord.setKey(Integer.parseInt(record.get(15).trim()));
+                        songRecord.setLoudness(Double.parseDouble(record.get(16).trim()));
+                        songRecord.setMode(Integer.parseInt(record.get(17).trim()));
+                        songRecord.setSpeechiness(Double.parseDouble(record.get(18).trim()));
+                        songRecord.setAcousticness(Double.parseDouble(record.get(19).trim()));
+                        songRecord.setInstrumentalness(Double.parseDouble(record.get(20).trim()));
+                        songRecord.setLiveness(Double.parseDouble(record.get(21).trim()));
+                        songRecord.setValence(Double.parseDouble(record.get(22).trim()));
+                        songRecord.setTempo(Double.parseDouble(record.get(23).trim()));
+                        songRecord.setTimeSignature(Integer.parseInt(record.get(24).trim()));
+
+                        return songRecord;
                     }
                 })
-                .filter(record -> record != null); // Filter out records with invalid dates
+                .filter(Objects::nonNull); // Filter out records with invalid dates
 
         // Key by country and song ID, then process to track consecutive days in top
         DataStream<Tuple3<String, String, String>> hitSongs = songStream
@@ -230,6 +227,7 @@ public class MarkHitSongs {
                             currentConsecutiveDays = 1;
                         }
                     }
+
                     lastDate = date;
                 }
 
@@ -249,7 +247,7 @@ public class MarkHitSongs {
                         record.getName() + " by " + record.getArtists() + 
                         " (" + maxConsecutiveDays + " days: " + 
                         top25Days.stream()
-                            .map(d -> d.toString())
+                            .map(LocalDate::toString)
                             .collect(java.util.stream.Collectors.joining(", ")) + ")"
                     ));
                     hasBeenReported = true;
