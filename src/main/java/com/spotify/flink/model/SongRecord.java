@@ -1,4 +1,4 @@
-package com.spotify.flink;
+package com.spotify.flink.model;
 
 import lombok.*;
 

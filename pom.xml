@@ -73,11 +73,44 @@
       <version>${flink.version}</version>
     </dependency>
 
+    <!-- Core library -->
+    <dependency>
+      <groupId>com.github.haifengl</groupId>
+      <artifactId>smile-core</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+
+<!--    &lt;!&ndash; Optional: for data frame manipulation &ndash;&gt;-->
+<!--    <dependency>-->
+<!--      <groupId>com.github.haifengl</groupId>-->
+<!--      <artifactId>smile-data</artifactId>-->
+<!--      <version>3.0.1</version>-->
+<!--    </dependency>-->
+<!--    -->
+<!--    &lt;!&ndash; Optional: Math stuff &ndash;&gt;-->
+<!--    <dependency>-->
+<!--      <groupId>com.github.haifengl</groupId>-->
+<!--      <artifactId>smile-math</artifactId>-->
+<!--      <version>3.0.1</version>-->
+<!--    </dependency>-->
+
     <!-- SLF4J logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.36</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.15.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.15.2</version>
     </dependency>
 
     <dependency>
