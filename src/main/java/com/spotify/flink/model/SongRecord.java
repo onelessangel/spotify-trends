@@ -1,4 +1,4 @@
-package com.spotify.flink;
+package com.spotify.flink.model;
 
 import lombok.*;
 
@@ -19,20 +19,20 @@ public class SongRecord {
     private LocalDate snapshotDate;
 //    private int popularity;
     private boolean isExplicit;
-    private int durationMs;
+    private long durationMs;
 //    private String albumName;
 //    private String albumReleaseDate;
-    private float danceability;
-    private float energy;
+    private double danceability;
+    private double energy;
     private int key;
-    private float loudness;
+    private double loudness;
     private int mode;
-    private float speechiness;
-    private float acousticness;
-    private float instrumentalness;
-    private float liveness;
-    private float valence;
-    private float tempo;
+    private double speechiness;
+    private double acousticness;
+    private double instrumentalness;
+    private double liveness;
+    private double valence;
+    private double tempo;
     private int timeSignature;
 
     @Override
