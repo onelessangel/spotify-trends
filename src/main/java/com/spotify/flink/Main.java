@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         WorkingTreeHelper.cleanWorkingTree();
-        BatchHitSongsJob.run(args);
+        BatchHitSongsJob.run();
         WorkingTreeHelper.renameWorkingTree();
         StreamingMLJob.run(args);
     }

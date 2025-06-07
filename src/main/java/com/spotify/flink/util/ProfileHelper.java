@@ -1,7 +1,7 @@
 package com.spotify.flink.util;
 
 public class ProfileHelper {
-    String describeSongProfile(double[] features) {
+    public String describeSongProfile(double[] features) {
         StringBuilder sb = new StringBuilder();
 
         double explicit = features[0];
@@ -19,70 +19,136 @@ public class ProfileHelper {
         double tempo = features[12];
         double timeSignature = features[13];
 
-        sb.append(String.format("Explicit: %.2f → ~%.0f%% of songs marked as explicit.\n", explicit, explicit * 100));
-        sb.append(String.format("Duration: %.1fs → Songs are ~%.1f minutes on average.\n", duration, duration / 60));
-        sb.append(String.format("Danceability: %.2f → %s\n", danceability, describeScale(danceability, "Undanceable", "Highly danceable")));
-        sb.append(String.format("Energy: %.2f → %s\n", energy, describeScale(energy, "Low energy", "High energy")));
-        sb.append(String.format("Key: %.2f → Average key is %s.\n", key, keyToPitchClass((int)Math.round(key))));
-        sb.append(String.format("Loudness: %.2f dB → %s\n", loudness, describeLoudness(loudness)));
-        sb.append(String.format("Mode: %.2f → ~%.0f%% major (others minor).\n", mode, mode * 100));
-        sb.append(String.format("Speechiness: %.3f → %s\n", speechiness, describeSpeechiness(speechiness)));
-        sb.append(String.format("Acousticness: %.2f → %s\n", acousticness, describeScale(acousticness, "Mostly electronic", "Highly acoustic")));
-        sb.append(String.format("Instrumentalness: %.3f → %s\n", instrumentalness, describeInstrumentalness(instrumentalness)));
-        sb.append(String.format("Liveness: %.2f → %s\n", liveness, describeLiveness(liveness)));
-        sb.append(String.format("Valence: %.2f → %s\n", valence, describeValence(valence)));
-        sb.append(String.format("Tempo: %.1f BPM → %s\n", tempo, describeTempo(tempo)));
-        sb.append(String.format("Time Signature: %.1f → Common time: %s\n", timeSignature, timeSignature == 4.0 ? "yes" : "no"));
+        sb.append(String.format("Explicit: ~%.0f%% of song marked explicit\n", explicit * 100));
+        sb.append(String.format("Duration: %.1fs (~%.1f min)\n", duration, duration / 60));
+        sb.append(String.format("Danceability: %.2f (%s)\n", danceability, describeScale(danceability, "undanceable", "highly danceable")));
+        sb.append(String.format("Energy: %.2f (%s).\n", energy, describeScale(energy, "low energy", "high energy")));
+        sb.append(String.format("Key: %s\n", keyToPitchClass((int) Math.round(key))));
+        sb.append(String.format("Loudness: %.2f dB (%s)\n", loudness, describeLoudness(loudness)));
+        sb.append(String.format("Mode: ~%.0f%% major\n", mode * 100));
+        sb.append(String.format("Speechiness: %.3f (%s)\n", speechiness, describeSpeechiness(speechiness)));
+        sb.append(String.format("Acousticness: %.2f (%s)\n", acousticness, describeScale(acousticness, "electronic", "acoustic")));
+        sb.append(String.format("Instrumentalness: %.3f (%s)\n", instrumentalness, describeInstrumentalness(instrumentalness)));
+        sb.append(String.format("Liveness: %.2f (%s)\n", liveness, describeLiveness(liveness)));
+        sb.append(String.format("Valence: %.2f (%s mood)\n", valence, describeValence(valence)));
+        sb.append(String.format("Tempo: %.1f BPM (%s)\n", tempo, describeTempo(tempo)));
+        sb.append(String.format("Time Signature: %.1f (%s)\n", timeSignature, timeSignature == 4.0 ? "common time" : "unusual meter"));
 
         return sb.toString();
     }
 
-    String describeScale(double value, String low, String high) {
-        if (value < 0.3) return "Low - " + low;
-        if (value > 0.7) return "High - " + high;
-        return "Moderate";
+    private String describeScale(double value, String low, String high) {
+        if (value < 0.3) return low;
+        if (value > 0.7) return high;
+        return "moderate";
     }
 
-    String describeLoudness(double loudness) {
-        if (loudness > -5) return "Very loud";
-        if (loudness > -10) return "Moderately loud";
-        return "Quiet";
+    private String describeLoudness(double loudness) {
+        if (loudness > -5) return "very loud";
+        if (loudness > -10) return "moderately loud";
+        return "quiet";
     }
 
-    String describeSpeechiness(double val) {
-        if (val > 0.66) return "Likely speech or talk-show";
-        if (val > 0.33) return "Somewhat speechy";
-        return "Low spoken word (musical)";
+    private String describeSpeechiness(double val) {
+        if (val > 0.66) return "talk-like (e.g., podcast)";
+        if (val > 0.33) return "some speech";
+        return "musical";
     }
 
-    String describeInstrumentalness(double val) {
-        if (val > 0.7) return "Mostly instrumental";
-        if (val > 0.3) return "Some instrumentals";
-        return "Mostly vocal";
+    private String describeInstrumentalness(double val) {
+        if (val > 0.7) return "mostly instrumental";
+        if (val > 0.3) return "partly instrumental";
+        return "mostly vocal";
     }
 
-    String describeLiveness(double val) {
-        if (val > 0.8) return "Very likely live recording";
-        if (val > 0.3) return "Some live ambiance";
-        return "Studio recording";
+    private String describeLiveness(double val) {
+        if (val > 0.8) return "live performance";
+        if (val > 0.3) return "live-like ambiance";
+        return "studio recording";
     }
 
-    String describeValence(double val) {
-        if (val > 0.75) return "Very happy/positive";
-        if (val > 0.4) return "Moderately positive";
-        return "Sad or serious mood";
+    private String describeValence(double val) {
+        if (val > 0.75) return "happy";
+        if (val > 0.4) return "positive";
+        return "serious";
     }
 
-    String describeTempo(double bpm) {
-        if (bpm < 60) return "Very slow (ballad)";
-        if (bpm < 90) return "Slow";
-        if (bpm < 120) return "Moderate";
-        if (bpm < 150) return "Fast";
-        return "Very fast (intense)";
+    private String describeTempo(double bpm) {
+        if (bpm < 60) return "very slow";
+        if (bpm < 90) return "slow";
+        if (bpm < 120) return "moderate";
+        if (bpm < 150) return "fast";
+        return "very fast";
     }
 
-    String keyToPitchClass(int key) {
+    private String keyToPitchClass(int key) {
         String[] keys = { "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B" };
         return keys[key % 12];
+    }
+
+    public String shortSummary(double[] features) {
+        if (features == null || features.length < 14) return "unknown song";
+
+        double valence = features[11];
+        double energy = features[3];
+        double tempo = features[12];
+        double danceability = features[2];
+        double acousticness = features[8];
+
+        String moodWord = moodWord(valence);
+        String tempoWord = tempoWord(tempo, energy);
+        String danceWord = danceWord(danceability);
+        String genreWord = genreWord(acousticness, energy);
+
+        String description = moodWord;
+
+        if (!tempoWord.isEmpty()) {
+            if (!description.isEmpty()) description += " ";
+            description += tempoWord;
+        }
+        if (!danceWord.isEmpty()) {
+            if (!description.isEmpty()) description += " ";
+            description += danceWord;
+        }
+        if (!genreWord.isEmpty()) {
+            if (!description.isEmpty()) description += " ";
+            description += genreWord;
+        } else {
+            if (!description.isEmpty()) description += " ";
+            description += "song";
+        }
+
+        return description.trim();
+    }
+
+    private String moodWord(double valence) {
+        if (valence > 0.75) return "upbeat";
+        if (valence > 0.5) return "bright";
+        if (valence > 0.3) return "moody";
+        return "dark";
+    }
+
+    private String tempoWord(double tempo, double energy) {
+        if (tempo < 70) return "slow";
+        if (tempo < 110) return energy > 0.6 ? "steady" : "calm";
+        if (tempo < 140) return "energetic";
+        return "fast";
+    }
+
+    private String danceWord(double danceability) {
+        if (danceability > 0.7) return "danceable";
+        if (danceability > 0.4) return "groovy";
+        return "";
+    }
+
+    private String genreWord(double acousticness, double energy) {
+        if (acousticness > 0.7) {
+            if (energy < 0.4) return "jazz song";
+            else return "folk song";
+        } else {
+            if (energy > 0.7) return "pop song";
+            if (energy > 0.4) return "rock song";
+            return "electronic song";
+        }
     }
 }
