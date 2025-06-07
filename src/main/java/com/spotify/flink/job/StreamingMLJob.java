@@ -36,6 +36,7 @@ public class StreamingMLJob {
 
         profiles.print();
 
-        env.execute("Streaming Hit Song ML Training");
+        System.out.println("Starting Flink job...");
+        env.execute("Streaming Hit Song ML Processing");
     }
 }

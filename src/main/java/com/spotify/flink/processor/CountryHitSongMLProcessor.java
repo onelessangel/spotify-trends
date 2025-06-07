@@ -1,6 +1,7 @@
 package com.spotify.flink.processor;
 
 import com.spotify.flink.model.SongRecordExtended;
+import com.spotify.flink.util.ProfileHelper;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
@@ -41,7 +42,7 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         Long currentTimer = timerState.value();
         long now = context.timerService().currentProcessingTime();
         if (currentTimer == null || currentTimer <= now) {
-            long timerTs = now + 60_000; // 1 minute later;
+            long timerTs = now + 30_000; // 30 seconds later;
             context.timerService().registerProcessingTimeTimer(timerTs);
             timerState.update(timerTs);
         }
@@ -53,7 +54,6 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             KeyedProcessFunction<String, SongRecordExtended, String>.OnTimerContext context,
             Collector<String> out) throws Exception {
         List<SongRecordExtended> songs = new ArrayList<>();
-//        System.out.println("Timer fired at " + timestamp + " for key " + context.getCurrentKey());
 
         for (SongRecordExtended record : buffer.get()) {
             songs.add(record);
@@ -77,24 +77,10 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         double[][] featureMatrix = featuresList.toArray(new double[0][]);
 
         // Train KMeans model (e.g., 2 clusters)
-        KMeans model = KMeans.fit(featureMatrix, 2);
+        KMeans model = KMeans.fit(featureMatrix, 4);
 
-        String[] featureNames = new String[] {
-                "Explicit (1 = yes, 0 = no)",
-                "Duration (seconds)",
-                "Danceability (0.0–1.0)",
-                "Energy (0.0–1.0)",
-                "Key (Pitch Class: 0 = C, 1 = C#/Db, ..., 11 = B)",
-                "Loudness (dB)",
-                "Mode (1 = major, 0 = minor)",
-                "Speechiness (0.0–1.0)",
-                "Acousticness (0.0–1.0)",
-                "Instrumentalness (0.0–1.0)",
-                "Liveness (0.0–1.0)",
-                "Valence (0.0–1.0, positivity)",
-                "Tempo (BPM)",
-                "Time Signature (beats per bar)"
-        };
+        // song profiler
+        ProfileHelper profileHelper = new ProfileHelper();
 
         // Build a profile string reporting cluster centers
         StringBuilder profile = new StringBuilder();
@@ -103,11 +89,9 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
 
         int clusterIndex = 1;
         for (double[] centroid : model.centroids) {
-            profile.append("Centroid ").append(clusterIndex++).append(":\n");
-            for (int i = 0; i < centroid.length; i++) {
-                profile.append("  ").append(featureNames[i]).append(": ").append(centroid[i]).append("\n");
-            }
-            profile.append("\n");
+            profile.append("Cluster ").append(clusterIndex++).append(" Summary:\n");
+            profile.append("→ ").append(profileHelper.shortSummary(centroid)).append("\n");
+            profile.append(profileHelper.describeSongProfile(centroid)).append("\n");
         }
 
         out.collect(profile.toString());

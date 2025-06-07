@@ -21,7 +21,7 @@ import static com.spotify.flink.processor.MarkHitSongs.*;
 import static com.spotify.flink.processor.DataIngestionCleaner.loadAndCleanSongs;
 
 public class BatchHitSongsJob {
-    public static void run(String[] args) throws Exception {
+    public static void run() throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Read CSV source (bounded)
