@@ -4,7 +4,7 @@ import com.spotify.flink.model.SongRecordExtended;
 
 /**
  * Util class for extracting the numerical features for the song. These will be used
- * bot for K-Means clustering and Random Forest classification.
+ * both for K-Means clustering and Random Forest classification.
  */
 public class FeatureExtractor {
     /**
