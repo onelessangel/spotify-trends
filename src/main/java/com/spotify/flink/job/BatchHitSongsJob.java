@@ -42,9 +42,9 @@ public class BatchHitSongsJob {
         FileSink<String> fileSink = FileSink
                 .forRowFormat(new Path(Main.OUTPUT_PATH), new SimpleStringEncoder<String>("UTF-8"))
                 .withRollingPolicy(DefaultRollingPolicy.builder()
-                    .withRolloverInterval(Duration.ofMinutes(15))
-                    .withInactivityInterval(Duration.ofMinutes(5))
-                    .build())
+                        .withRolloverInterval(Duration.ofMinutes(15))
+                        .withInactivityInterval(Duration.ofMinutes(5))
+                        .build())
                 .build();
 
         jsonStream.sinkTo(fileSink);
@@ -62,10 +62,9 @@ public class BatchHitSongsJob {
 //
 //        roSongs.print(); // This will print only RO records
 
-
-        System.out.println("Starting Flink job...");
+        System.out.println("Starting Flink batch job: Spotify Hit Songs Detection...");
         JobExecutionResult result = env.execute("Spotify Hit Songs Detection");
-        System.out.println("Flink job finished.");
+        System.out.println("Flink batch job finished.");
 
         Long validCountLong = result.getAccumulatorResult(VALID_RECORDS);
         Long parsedCountLong = result.getAccumulatorResult(PARSED_RECORDS);
@@ -75,10 +74,10 @@ public class BatchHitSongsJob {
         long parsedCount = (parsedCountLong != null) ? parsedCountLong : 0L;
         long hitSongsCount = (hitSongsCountLong != null) ? hitSongsCountLong : 0L;
 
-        System.out.println("\n--- Final Aggregated Counts ---");
+        System.out.println("\n--- Final Aggregated Counts (batch job) ---");
         System.out.println("Valid records (non-empty fields): " + validCount);
         System.out.println("Parsed records: " + parsedCount);
-        System.out.println("Hit songs records: " + hitSongsCount);
+        System.out.println("Total distinct hit songs detected: " + hitSongsCount);
         System.out.println("-------------------------------\n");
     }
 }

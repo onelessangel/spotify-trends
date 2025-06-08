@@ -42,7 +42,7 @@ public class MarkHitSongs {
         @Override
         public void open(Configuration parameters) {
             ValueStateDescriptor<List<LocalDate>> daysDescriptor =
-                    new ValueStateDescriptor<>("top25-days", Types.LIST(Types.LOCAL_DATE));
+                    new ValueStateDescriptor<>("top-rank-days", Types.LIST(Types.LOCAL_DATE));
             topDaysState = getRuntimeContext().getState(daysDescriptor);
 
             ValueStateDescriptor<Boolean> reportedDescriptor =
@@ -59,9 +59,9 @@ public class MarkHitSongs {
                 Context ctx,
                 Collector<SongRecordExtended> out) throws Exception {
 
-            List<LocalDate> top25Days = topDaysState.value();
-            if (top25Days == null) {
-                top25Days = new ArrayList<>();
+            List<LocalDate> topDays = topDaysState.value();
+            if (topDays == null) {
+                topDays = new ArrayList<>();
             }
 
             Boolean hasBeenReported = hasBeenReportedState.value();
@@ -73,9 +73,9 @@ public class MarkHitSongs {
 
             if (record.getDailyRank() <= TOP_RANK_THRESHOLD) {
                 // Only add if this date isn't already in the list
-                if (!top25Days.contains(currentDate)) {
-                    top25Days.add(currentDate);
-                    top25Days.sort(LocalDate::compareTo);
+                if (!topDays.contains(currentDate)) {
+                    topDays.add(currentDate);
+                    topDays.sort(LocalDate::compareTo);
                 }
 
                 // Check for consecutive days
@@ -83,7 +83,7 @@ public class MarkHitSongs {
                 int currentConsecutiveDays = 1;
                 LocalDate lastDate = null;
 
-                for (LocalDate date : top25Days) {
+                for (LocalDate date : topDays) {
                     if (lastDate != null) {
                         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(lastDate, date);
                         if (daysBetween == 1) {
@@ -102,7 +102,7 @@ public class MarkHitSongs {
 //                if (maxConsecutiveDays >= 10 && !hasBeenReported) {
 //                    System.out.println("Song " + record.getName() + " by " + record.getArtists() +
 //                        " has " + maxConsecutiveDays + " consecutive days in top 25. Dates: " +
-//                        top25Days.stream()
+//                        topDays.stream()
 //                            .map(d -> d.toString())
 //                            .collect(java.util.stream.Collectors.joining(", ")));
 //                }
@@ -110,7 +110,7 @@ public class MarkHitSongs {
                 if (maxConsecutiveDays >= CONSECUTIVE_DAYS_THRESHOLD && !hasBeenReported) {
                     SongRecordExtended extendedRecord = new SongRecordExtended(record);
                     extendedRecord.setConsecutiveHitDaysCount(maxConsecutiveDays);
-                    extendedRecord.setConsecutiveHitDaysList(top25Days.stream().map(LocalDate::toString).collect(Collectors.toList()));
+                    extendedRecord.setConsecutiveHitDaysList(topDays.stream().map(LocalDate::toString).collect(Collectors.toList()));
 
                     out.collect(extendedRecord);
                     hitSongsRecords.add(1);
@@ -119,10 +119,10 @@ public class MarkHitSongs {
                 }
             } else {
                 // Only remove this specific date if the song is not in top 25
-                top25Days.remove(currentDate);
+                topDays.remove(currentDate);
             }
 
-            topDaysState.update(top25Days);
+            topDaysState.update(topDays);
         }
     }
 }

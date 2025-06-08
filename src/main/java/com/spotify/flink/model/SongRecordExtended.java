@@ -35,6 +35,7 @@ public class SongRecordExtended {
     private int timeSignature;
     private int consecutiveHitDaysCount;
     private List<String> consecutiveHitDaysList;
+    private boolean isHit;
 
     public SongRecordExtended(SongRecord record) {
         this.spotifyId = record.getSpotifyId();
@@ -58,6 +59,7 @@ public class SongRecordExtended {
         this.timeSignature = record.getTimeSignature();
         this.consecutiveHitDaysCount = 0;
         this.consecutiveHitDaysList = new ArrayList<>();
+        this.isHit = false;
     }
 
     @Override
