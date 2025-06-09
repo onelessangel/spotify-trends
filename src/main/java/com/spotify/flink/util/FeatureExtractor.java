@@ -1,6 +1,7 @@
 package com.spotify.flink.util;
 
 import com.spotify.flink.model.SongRecordExtended;
+import smile.data.vector.IntVector;
 
 /**
  * Util class for extracting the numerical features for the song. These will be used

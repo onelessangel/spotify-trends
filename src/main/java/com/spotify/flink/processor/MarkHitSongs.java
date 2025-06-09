@@ -3,6 +3,7 @@ package com.spotify.flink.processor;
 import com.spotify.flink.model.SongRecord;
 import com.spotify.flink.model.SongRecordExtended;
 import org.apache.flink.api.common.accumulators.LongCounter;
+import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -10,16 +11,17 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
 import org.apache.flink.util.Collector;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.spotify.flink.job.BatchHitSongsJob.HIT_SONG_DESCRIPTOR;
+
 public class MarkHitSongs {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final int TOP_RANK_THRESHOLD = 10;
     private static final int CONSECUTIVE_DAYS_THRESHOLD = 14;
 
@@ -108,7 +110,7 @@ public class MarkHitSongs {
 //                }
 
                 if (maxConsecutiveDays >= CONSECUTIVE_DAYS_THRESHOLD && !hasBeenReported) {
-                    SongRecordExtended extendedRecord = new SongRecordExtended(record);
+                    SongRecordExtended extendedRecord = new SongRecordExtended(record, true);
                     extendedRecord.setConsecutiveHitDaysCount(maxConsecutiveDays);
                     extendedRecord.setConsecutiveHitDaysList(topDays.stream().map(LocalDate::toString).collect(Collectors.toList()));
 
@@ -125,4 +127,32 @@ public class MarkHitSongs {
             topDaysState.update(topDays);
         }
     }
+
+    public static class LabelHitSongs extends KeyedBroadcastProcessFunction<
+                Tuple2<String, String>, // key: (country, spotifyId)
+                SongRecord,             // main stream
+                SongRecordExtended,     // broadcasted stream
+                SongRecordExtended>     // output
+    {
+        @Override
+        public void processElement(SongRecord song, ReadOnlyContext ctx, Collector<SongRecordExtended> out) throws Exception {
+            ReadOnlyBroadcastState<String, SongRecordExtended> hitState = ctx.getBroadcastState(HIT_SONG_DESCRIPTOR);
+            String key = song.getCountry() + "|" + song.getSpotifyId();
+
+            SongRecordExtended hitRecord = hitState.get(key);
+
+            if (hitRecord != null) {
+                out.collect(hitRecord); // already labeled as hit
+            } else {
+                out.collect(new SongRecordExtended(song, false)); // mark as non-hit
+            }
+        }
+
+        @Override
+        public void processBroadcastElement(SongRecordExtended hit, Context ctx, Collector<SongRecordExtended> out) throws Exception {
+            String key = hit.getCountry() + "|" + hit.getSpotifyId();
+            ctx.getBroadcastState(HIT_SONG_DESCRIPTOR).put(key, hit);
+        }
+    }
+
 }

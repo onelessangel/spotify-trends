@@ -1,5 +1,6 @@
 package com.spotify.flink.processor;
 
+import com.spotify.flink.Main;
 import com.spotify.flink.model.SongRecordExtended;
 import com.spotify.flink.util.ProfileHelper;
 import com.spotify.flink.util.FeatureExtractor;
@@ -19,8 +20,15 @@ import smile.data.DataFrame;
 import smile.data.formula.Formula;
 import smile.data.vector.IntVector;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, SongRecordExtended, String> {
@@ -37,6 +45,20 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         // Initialize timerState to keep track of the registered timer
         ValueStateDescriptor<Long> timerDescriptor = new ValueStateDescriptor<>("timerState", Long.class);
         timerState = getRuntimeContext().getState(timerDescriptor);
+    }
+
+    private static void saveModel(RandomForest model, String country) throws IOException {
+        String outputFolder = Main.OUTPUT_PATH + "/models";
+        // Build the full path safely
+        Path path = Paths.get(outputFolder);
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+        Path filePath = Paths.get(outputFolder, country + ".model");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
+            oos.writeObject(model);
+            System.out.println("Model for " + country + " saved as " + filePath + "\n");
+        }
     }
 
     @Override
@@ -81,8 +103,31 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         List<double[]> featuresList = new ArrayList<>();
         List<Integer> labelsList = new ArrayList<>();
 
+        // For KMeans, only train on hit songs
+        List<SongRecordExtended> hitSongs = songs.stream()
+                .filter(SongRecordExtended::isHit)
+                .collect(Collectors.toList());
+
+        // Extract features for hit songs only (for clustering)
+        double[][] hitFeatures = hitSongs.stream()
+                .map(FeatureExtractor::extractFeatures)
+                .toArray(double[][]::new);
+
+        StringBuilder modelsOutput = new StringBuilder()
+                .append("Country: ").append(context.getCurrentKey())
+                .append("\nRecords processed: ").append(songs.size())
+                .append("\n--- ML Models Output ---\n");
+
+        // KMeans
+        if (hitFeatures.length > 0) {
+            applyKMeans(hitFeatures, modelsOutput);
+        } else {
+            modelsOutput.append("\nNo hit songs available for KMeans clustering.\n");
+        }
+
+        // Random Forest
         // Choose a song for prediction
-        SongRecordExtended sampleSongForPrediction = songs.get(0);
+        SongRecordExtended sampleSongForPrediction = hitSongs.get(0);
 
         // Collect "isHit" label for Random Forest
         for (SongRecordExtended song : songs) {
@@ -93,15 +138,18 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         double[][] featureMatrix = featuresList.toArray(new double[0][]);
         int[] labels = labelsList.stream().mapToInt(i -> i).toArray();
 
-        StringBuilder profile = new StringBuilder()
-                .append("Country: ").append(context.getCurrentKey())
-                .append("\nRecords processed: ").append(songs.size())
-                .append("\n--- ML Models Output ---\n");
+        // Only run RF if we have both classes
+        long hitCount = labelsList.stream().filter(l -> l == 1).count();
+        long nonHitCount = labelsList.size() - hitCount;
 
-        applyKMeans(featureMatrix, profile);
-        applyRandomForest(featureMatrix, labels, sampleSongForPrediction, profile);
+        if (hitCount == 0 || nonHitCount == 0) {
+            modelsOutput.append("\nSkipping RF training: need both hits and non-hits. Hits: ")
+                    .append(hitCount).append(", Non-hits: ").append(nonHitCount).append("\n");
+        } else {
+            applyRandomForest(featureMatrix, labels, sampleSongForPrediction, modelsOutput, context.getCurrentKey());
+        }
 
-        out.collect(profile.toString());
+        out.collect(modelsOutput.toString());
     }
 
     private void applyKMeans(double[][] featureMatrix, StringBuilder profile) {
@@ -125,7 +173,7 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         }
     }
 
-    private void applyRandomForest(double[][] features, int[] labels, SongRecordExtended song, StringBuilder profile) {
+    private void applyRandomForest(double[][] features, int[] labels, SongRecordExtended song, StringBuilder modelsOutput, String country) {
         try {
             int numFeatures = features[0].length;
 
@@ -136,16 +184,25 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             DataFrame df = DataFrame.of(features, featureNames).merge(IntVector.of("label", labels));
             RandomForest rf = RandomForest.fit(Formula.lhs("label"), df);
 
-            profile.append("\n--- Random Forest Classification ---\n");
-            profile.append("Trained RF with ").append(numFeatures).append(" features.\n");
+            modelsOutput.append("\n--- Random Forest Classification ---\n");
+            modelsOutput.append("Trained RF with ").append(numFeatures).append(" features.\n");
 
-            int prediction = rf.predict(DataFrame.of(new double[][]{FeatureExtractor.extractFeatures(song)}, featureNames))[0];
+            // Test prediction
+            double[][] predictFeatures = new double[][]{FeatureExtractor.extractFeatures(song)};
+            DataFrame predictDf = DataFrame.of(predictFeatures, featureNames)
+                    .merge(IntVector.of("label", new int[]{0}));
 
-            profile.append("\n--- Prediction Random Forest ---\nSample song: '")
+            int prediction = rf.predict(predictDf)[0];
+
+            modelsOutput.append("\n--- Prediction Random Forest ---\nSample song: '")
                     .append(song.getName()).append("' is predicted to be ")
                     .append(prediction == 1 ? "a HIT." : "not a HIT.").append("\n");
+
+            // Save model
+            saveModel(rf, country);
         } catch (Exception e) {
-            profile.append("\nRandom Forest FAILED");
+            modelsOutput.append("\nRandom Forest FAILED\n");
+            modelsOutput.append(e.getMessage());
         }
     }
 }

@@ -11,17 +11,11 @@ import java.time.LocalDate;
 public class SongRecord {
     private String spotifyId;
     private String name;
-    // private String artists;
     private int dailyRank;
-    // private int dailyMovement;
-    // private int weeklyMovement;
     private String country;
     private LocalDate snapshotDate;
-    // private int popularity;
     private boolean isExplicit;
     private long durationMs;
-    // private String albumName;
-    // private String albumReleaseDate;
     private double danceability;
     private double energy;
     private int key;
@@ -34,6 +28,29 @@ public class SongRecord {
     private double valence;
     private double tempo;
     private int timeSignature;
+
+    public SongRecord(SongRecord other) {
+        this.spotifyId = other.spotifyId;
+        this.name = other.name;
+        this.dailyRank = other.dailyRank;
+        this.country = other.country;
+        this.snapshotDate = other.snapshotDate;
+        this.isExplicit = other.isExplicit;
+        this.durationMs = other.durationMs;
+        this.danceability = other.danceability;
+        this.energy = other.energy;
+        this.key = other.key;
+        this.loudness = other.loudness;
+        this.mode = other.mode;
+        this.speechiness = other.speechiness;
+        this.acousticness = other.acousticness;
+        this.instrumentalness = other.instrumentalness;
+        this.liveness = other.liveness;
+        this.valence = other.valence;
+        this.tempo = other.tempo;
+        this.timeSignature = other.timeSignature;
+    }
+
 
     @Override
     public String toString() {
