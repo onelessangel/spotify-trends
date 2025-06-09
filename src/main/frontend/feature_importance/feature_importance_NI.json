@@ -1,0 +1,19 @@
+{
+  "country" : "NI",
+  "featureImportances" : {
+    "explicit" : 0.76,
+    "durationSeconds" : 8.66,
+    "danceability" : 9.36,
+    "energy" : 9.61,
+    "key" : 5.11,
+    "loudness" : 10.11,
+    "mode" : 1.62,
+    "speechiness" : 10.5,
+    "acousticness" : 8.99,
+    "instrumentalness" : 6.44,
+    "liveness" : 8.54,
+    "valence" : 9.59,
+    "tempo" : 9.92,
+    "timeSignature" : 0.8
+  }
+}

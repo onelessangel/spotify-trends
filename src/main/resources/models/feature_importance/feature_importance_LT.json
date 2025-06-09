@@ -1,0 +1,19 @@
+{
+  "country" : "LT",
+  "featureImportances" : {
+    "explicit" : 0.41,
+    "durationSeconds" : 10.65,
+    "danceability" : 10.03,
+    "energy" : 10.47,
+    "key" : 3.92,
+    "loudness" : 9.09,
+    "mode" : 0.83,
+    "speechiness" : 9.05,
+    "acousticness" : 9.46,
+    "instrumentalness" : 6.99,
+    "liveness" : 8.57,
+    "valence" : 10.45,
+    "tempo" : 9.77,
+    "timeSignature" : 0.32
+  }
+}

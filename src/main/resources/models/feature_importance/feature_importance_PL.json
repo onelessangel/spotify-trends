@@ -1,0 +1,19 @@
+{
+  "country" : "PL",
+  "featureImportances" : {
+    "explicit" : 0.48,
+    "durationSeconds" : 7.76,
+    "danceability" : 10.78,
+    "energy" : 9.45,
+    "key" : 4.03,
+    "loudness" : 9.81,
+    "mode" : 0.51,
+    "speechiness" : 10.32,
+    "acousticness" : 9.98,
+    "instrumentalness" : 4.68,
+    "liveness" : 10.55,
+    "valence" : 9.6,
+    "tempo" : 11.38,
+    "timeSignature" : 0.67
+  }
+}

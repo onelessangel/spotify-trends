@@ -1,0 +1,19 @@
+{
+  "country" : "CA",
+  "featureImportances" : {
+    "explicit" : 0.57,
+    "durationSeconds" : 8.67,
+    "danceability" : 8.45,
+    "energy" : 9.87,
+    "key" : 3.47,
+    "loudness" : 10.14,
+    "mode" : 0.25,
+    "speechiness" : 10.52,
+    "acousticness" : 11.31,
+    "instrumentalness" : 4.2,
+    "liveness" : 10.21,
+    "valence" : 10.85,
+    "tempo" : 11.01,
+    "timeSignature" : 0.48
+  }
+}

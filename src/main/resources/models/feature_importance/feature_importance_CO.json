@@ -1,0 +1,19 @@
+{
+  "country" : "CO",
+  "featureImportances" : {
+    "explicit" : 0.97,
+    "durationSeconds" : 9.26,
+    "danceability" : 8.92,
+    "energy" : 10.37,
+    "key" : 5.78,
+    "loudness" : 9.33,
+    "mode" : 0.34,
+    "speechiness" : 9.64,
+    "acousticness" : 10.56,
+    "instrumentalness" : 5.55,
+    "liveness" : 9.41,
+    "valence" : 10.05,
+    "tempo" : 9.19,
+    "timeSignature" : 0.63
+  }
+}

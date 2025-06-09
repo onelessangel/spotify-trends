@@ -1,0 +1,19 @@
+{
+  "country" : "SA",
+  "featureImportances" : {
+    "explicit" : 0.43,
+    "durationSeconds" : 9.95,
+    "danceability" : 9.02,
+    "energy" : 10.69,
+    "key" : 4.1,
+    "loudness" : 9.12,
+    "mode" : 0.35,
+    "speechiness" : 9.95,
+    "acousticness" : 10.0,
+    "instrumentalness" : 6.1,
+    "liveness" : 9.53,
+    "valence" : 9.61,
+    "tempo" : 10.64,
+    "timeSignature" : 0.51
+  }
+}

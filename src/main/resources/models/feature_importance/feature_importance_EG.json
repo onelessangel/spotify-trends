@@ -1,0 +1,19 @@
+{
+  "country" : "EG",
+  "featureImportances" : {
+    "explicit" : 0.37,
+    "durationSeconds" : 9.78,
+    "danceability" : 9.98,
+    "energy" : 9.74,
+    "key" : 4.83,
+    "loudness" : 11.14,
+    "mode" : 0.69,
+    "speechiness" : 9.98,
+    "acousticness" : 10.1,
+    "instrumentalness" : 4.91,
+    "liveness" : 10.0,
+    "valence" : 8.88,
+    "tempo" : 9.58,
+    "timeSignature" : 0.02
+  }
+}

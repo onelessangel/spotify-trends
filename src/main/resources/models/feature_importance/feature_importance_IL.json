@@ -1,0 +1,19 @@
+{
+  "country" : "IL",
+  "featureImportances" : {
+    "explicit" : 0.23,
+    "durationSeconds" : 8.0,
+    "danceability" : 9.12,
+    "energy" : 10.13,
+    "key" : 5.38,
+    "loudness" : 9.44,
+    "mode" : 1.0,
+    "speechiness" : 11.61,
+    "acousticness" : 10.16,
+    "instrumentalness" : 4.39,
+    "liveness" : 9.54,
+    "valence" : 9.84,
+    "tempo" : 10.44,
+    "timeSignature" : 0.7
+  }
+}

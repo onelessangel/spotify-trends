@@ -1,0 +1,19 @@
+{
+  "country" : "CL",
+  "featureImportances" : {
+    "explicit" : 0.84,
+    "durationSeconds" : 9.22,
+    "danceability" : 10.32,
+    "energy" : 9.32,
+    "key" : 6.14,
+    "loudness" : 10.0,
+    "mode" : 0.63,
+    "speechiness" : 9.54,
+    "acousticness" : 9.26,
+    "instrumentalness" : 6.49,
+    "liveness" : 8.21,
+    "valence" : 10.35,
+    "tempo" : 9.54,
+    "timeSignature" : 0.16
+  }
+}

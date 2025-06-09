@@ -1,0 +1,19 @@
+{
+  "country" : "PK",
+  "featureImportances" : {
+    "explicit" : 0.17,
+    "durationSeconds" : 9.25,
+    "danceability" : 10.56,
+    "energy" : 8.88,
+    "key" : 5.9,
+    "loudness" : 9.08,
+    "mode" : 0.74,
+    "speechiness" : 9.81,
+    "acousticness" : 10.95,
+    "instrumentalness" : 6.07,
+    "liveness" : 8.89,
+    "valence" : 9.56,
+    "tempo" : 9.15,
+    "timeSignature" : 1.0
+  }
+}

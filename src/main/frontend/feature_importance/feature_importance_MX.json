@@ -1,0 +1,19 @@
+{
+  "country" : "MX",
+  "featureImportances" : {
+    "explicit" : 1.03,
+    "durationSeconds" : 9.83,
+    "danceability" : 10.37,
+    "energy" : 9.45,
+    "key" : 4.86,
+    "loudness" : 8.83,
+    "mode" : 1.26,
+    "speechiness" : 10.37,
+    "acousticness" : 7.8,
+    "instrumentalness" : 6.18,
+    "liveness" : 9.2,
+    "valence" : 9.86,
+    "tempo" : 9.76,
+    "timeSignature" : 1.19
+  }
+}

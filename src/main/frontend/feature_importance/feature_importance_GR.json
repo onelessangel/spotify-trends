@@ -1,0 +1,19 @@
+{
+  "country" : "GR",
+  "featureImportances" : {
+    "explicit" : 0.2,
+    "durationSeconds" : 10.25,
+    "danceability" : 10.59,
+    "energy" : 9.65,
+    "key" : 5.34,
+    "loudness" : 9.32,
+    "mode" : 0.86,
+    "speechiness" : 10.76,
+    "acousticness" : 9.29,
+    "instrumentalness" : 5.25,
+    "liveness" : 9.0,
+    "valence" : 9.55,
+    "tempo" : 9.58,
+    "timeSignature" : 0.35
+  }
+}

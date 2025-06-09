@@ -1,0 +1,19 @@
+{
+  "country" : "PH",
+  "featureImportances" : {
+    "explicit" : 0.55,
+    "durationSeconds" : 10.45,
+    "danceability" : 9.5,
+    "energy" : 8.85,
+    "key" : 6.16,
+    "loudness" : 8.37,
+    "mode" : 0.61,
+    "speechiness" : 10.33,
+    "acousticness" : 9.42,
+    "instrumentalness" : 5.37,
+    "liveness" : 10.02,
+    "valence" : 9.71,
+    "tempo" : 10.0,
+    "timeSignature" : 0.66
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "AE",
+  "featureImportances" : {
+    "explicit" : 0.57,
+    "durationSeconds" : 8.91,
+    "danceability" : 11.14,
+    "energy" : 10.06,
+    "key" : 4.21,
+    "loudness" : 8.81,
+    "mode" : 0.49,
+    "speechiness" : 10.53,
+    "acousticness" : 9.3,
+    "instrumentalness" : 6.98,
+    "liveness" : 8.22,
+    "valence" : 10.19,
+    "tempo" : 10.38,
+    "timeSignature" : 0.21
+  }
+}

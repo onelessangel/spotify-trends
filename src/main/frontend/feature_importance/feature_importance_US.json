@@ -1,0 +1,19 @@
+{
+  "country" : "US",
+  "featureImportances" : {
+    "explicit" : 0.37,
+    "durationSeconds" : 9.35,
+    "danceability" : 9.35,
+    "energy" : 8.11,
+    "key" : 5.38,
+    "loudness" : 10.88,
+    "mode" : 0.4,
+    "speechiness" : 10.07,
+    "acousticness" : 12.23,
+    "instrumentalness" : 4.67,
+    "liveness" : 8.86,
+    "valence" : 9.79,
+    "tempo" : 10.24,
+    "timeSignature" : 0.31
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "TR",
+  "featureImportances" : {
+    "explicit" : 0.69,
+    "durationSeconds" : 8.58,
+    "danceability" : 8.84,
+    "energy" : 9.7,
+    "key" : 6.95,
+    "loudness" : 9.13,
+    "mode" : 0.65,
+    "speechiness" : 10.21,
+    "acousticness" : 9.93,
+    "instrumentalness" : 5.75,
+    "liveness" : 10.0,
+    "valence" : 8.62,
+    "tempo" : 10.55,
+    "timeSignature" : 0.39
+  }
+}

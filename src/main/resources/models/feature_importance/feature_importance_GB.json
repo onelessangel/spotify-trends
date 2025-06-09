@@ -1,0 +1,19 @@
+{
+  "country" : "GB",
+  "featureImportances" : {
+    "explicit" : 0.41,
+    "durationSeconds" : 7.7,
+    "danceability" : 10.67,
+    "energy" : 8.88,
+    "key" : 4.94,
+    "loudness" : 10.01,
+    "mode" : 0.56,
+    "speechiness" : 11.8,
+    "acousticness" : 8.53,
+    "instrumentalness" : 5.43,
+    "liveness" : 10.31,
+    "valence" : 9.86,
+    "tempo" : 10.16,
+    "timeSignature" : 0.73
+  }
+}

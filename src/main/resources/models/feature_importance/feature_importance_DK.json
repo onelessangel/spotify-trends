@@ -1,0 +1,19 @@
+{
+  "country" : "DK",
+  "featureImportances" : {
+    "explicit" : 0.61,
+    "durationSeconds" : 8.75,
+    "danceability" : 11.23,
+    "energy" : 9.53,
+    "key" : 5.27,
+    "loudness" : 10.28,
+    "mode" : 0.2,
+    "speechiness" : 10.5,
+    "acousticness" : 8.92,
+    "instrumentalness" : 3.94,
+    "liveness" : 9.91,
+    "valence" : 9.64,
+    "tempo" : 10.7,
+    "timeSignature" : 0.51
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "AR",
+  "featureImportances" : {
+    "explicit" : 0.6,
+    "durationSeconds" : 8.81,
+    "danceability" : 10.16,
+    "energy" : 9.93,
+    "key" : 4.21,
+    "loudness" : 10.92,
+    "mode" : 0.58,
+    "speechiness" : 9.6,
+    "acousticness" : 10.07,
+    "instrumentalness" : 3.81,
+    "liveness" : 9.27,
+    "valence" : 11.44,
+    "tempo" : 10.22,
+    "timeSignature" : 0.39
+  }
+}

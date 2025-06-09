@@ -1,0 +1,19 @@
+{
+  "country" : "RO",
+  "featureImportances" : {
+    "explicit" : 0.35,
+    "durationSeconds" : 8.19,
+    "danceability" : 9.38,
+    "energy" : 8.42,
+    "key" : 5.65,
+    "loudness" : 11.1,
+    "mode" : 0.86,
+    "speechiness" : 9.42,
+    "acousticness" : 9.17,
+    "instrumentalness" : 6.82,
+    "liveness" : 9.56,
+    "valence" : 10.05,
+    "tempo" : 10.99,
+    "timeSignature" : 0.04
+  }
+}

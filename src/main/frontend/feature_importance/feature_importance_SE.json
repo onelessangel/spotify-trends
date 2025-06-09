@@ -1,0 +1,19 @@
+{
+  "country" : "SE",
+  "featureImportances" : {
+    "explicit" : 0.71,
+    "durationSeconds" : 10.1,
+    "danceability" : 9.96,
+    "energy" : 9.84,
+    "key" : 4.94,
+    "loudness" : 9.82,
+    "mode" : 0.42,
+    "speechiness" : 10.29,
+    "acousticness" : 9.38,
+    "instrumentalness" : 4.98,
+    "liveness" : 9.4,
+    "valence" : 9.21,
+    "tempo" : 10.22,
+    "timeSignature" : 0.73
+  }
+}
