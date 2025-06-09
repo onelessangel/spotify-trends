@@ -3,6 +3,7 @@ package com.spotify.flink.processor;
 import com.spotify.flink.model.SongRecord;
 import com.spotify.flink.model.SongRecordExtended;
 import org.apache.flink.api.common.accumulators.LongCounter;
+import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -10,16 +11,17 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
 import org.apache.flink.util.Collector;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.spotify.flink.job.BatchHitSongsJob.HIT_SONG_DESCRIPTOR;
+
 public class MarkHitSongs {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final int TOP_RANK_THRESHOLD = 10;
     private static final int CONSECUTIVE_DAYS_THRESHOLD = 14;
 
@@ -42,7 +44,7 @@ public class MarkHitSongs {
         @Override
         public void open(Configuration parameters) {
             ValueStateDescriptor<List<LocalDate>> daysDescriptor =
-                    new ValueStateDescriptor<>("top25-days", Types.LIST(Types.LOCAL_DATE));
+                    new ValueStateDescriptor<>("top-rank-days", Types.LIST(Types.LOCAL_DATE));
             topDaysState = getRuntimeContext().getState(daysDescriptor);
 
             ValueStateDescriptor<Boolean> reportedDescriptor =
@@ -59,9 +61,9 @@ public class MarkHitSongs {
                 Context ctx,
                 Collector<SongRecordExtended> out) throws Exception {
 
-            List<LocalDate> top25Days = topDaysState.value();
-            if (top25Days == null) {
-                top25Days = new ArrayList<>();
+            List<LocalDate> topDays = topDaysState.value();
+            if (topDays == null) {
+                topDays = new ArrayList<>();
             }
 
             Boolean hasBeenReported = hasBeenReportedState.value();
@@ -73,9 +75,9 @@ public class MarkHitSongs {
 
             if (record.getDailyRank() <= TOP_RANK_THRESHOLD) {
                 // Only add if this date isn't already in the list
-                if (!top25Days.contains(currentDate)) {
-                    top25Days.add(currentDate);
-                    top25Days.sort(LocalDate::compareTo);
+                if (!topDays.contains(currentDate)) {
+                    topDays.add(currentDate);
+                    topDays.sort(LocalDate::compareTo);
                 }
 
                 // Check for consecutive days
@@ -83,7 +85,7 @@ public class MarkHitSongs {
                 int currentConsecutiveDays = 1;
                 LocalDate lastDate = null;
 
-                for (LocalDate date : top25Days) {
+                for (LocalDate date : topDays) {
                     if (lastDate != null) {
                         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(lastDate, date);
                         if (daysBetween == 1) {
@@ -102,15 +104,15 @@ public class MarkHitSongs {
 //                if (maxConsecutiveDays >= 10 && !hasBeenReported) {
 //                    System.out.println("Song " + record.getName() + " by " + record.getArtists() +
 //                        " has " + maxConsecutiveDays + " consecutive days in top 25. Dates: " +
-//                        top25Days.stream()
+//                        topDays.stream()
 //                            .map(d -> d.toString())
 //                            .collect(java.util.stream.Collectors.joining(", ")));
 //                }
 
                 if (maxConsecutiveDays >= CONSECUTIVE_DAYS_THRESHOLD && !hasBeenReported) {
-                    SongRecordExtended extendedRecord = new SongRecordExtended(record);
+                    SongRecordExtended extendedRecord = new SongRecordExtended(record, true);
                     extendedRecord.setConsecutiveHitDaysCount(maxConsecutiveDays);
-                    extendedRecord.setConsecutiveHitDaysList(top25Days.stream().map(LocalDate::toString).collect(Collectors.toList()));
+                    extendedRecord.setConsecutiveHitDaysList(topDays.stream().map(LocalDate::toString).collect(Collectors.toList()));
 
                     out.collect(extendedRecord);
                     hitSongsRecords.add(1);
@@ -119,10 +121,38 @@ public class MarkHitSongs {
                 }
             } else {
                 // Only remove this specific date if the song is not in top 25
-                top25Days.remove(currentDate);
+                topDays.remove(currentDate);
             }
 
-            topDaysState.update(top25Days);
+            topDaysState.update(topDays);
         }
     }
+
+    public static class LabelHitSongs extends KeyedBroadcastProcessFunction<
+                Tuple2<String, String>, // key: (country, spotifyId)
+                SongRecord,             // main stream
+                SongRecordExtended,     // broadcasted stream
+                SongRecordExtended>     // output
+    {
+        @Override
+        public void processElement(SongRecord song, ReadOnlyContext ctx, Collector<SongRecordExtended> out) throws Exception {
+            ReadOnlyBroadcastState<String, SongRecordExtended> hitState = ctx.getBroadcastState(HIT_SONG_DESCRIPTOR);
+            String key = song.getCountry() + "|" + song.getSpotifyId();
+
+            SongRecordExtended hitRecord = hitState.get(key);
+
+            if (hitRecord != null) {
+                out.collect(hitRecord); // already labeled as hit
+            } else {
+                out.collect(new SongRecordExtended(song, false)); // mark as non-hit
+            }
+        }
+
+        @Override
+        public void processBroadcastElement(SongRecordExtended hit, Context ctx, Collector<SongRecordExtended> out) throws Exception {
+            String key = hit.getCountry() + "|" + hit.getSpotifyId();
+            ctx.getBroadcastState(HIT_SONG_DESCRIPTOR).put(key, hit);
+        }
+    }
+
 }

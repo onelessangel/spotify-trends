@@ -1,7 +1,11 @@
 package com.spotify.flink.processor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.spotify.flink.Main;
 import com.spotify.flink.model.SongRecordExtended;
 import com.spotify.flink.util.ProfileHelper;
+import com.spotify.flink.util.FeatureExtractor;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
@@ -11,10 +15,22 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import smile.clustering.KMeans;
 
-import java.util.ArrayList;
-import java.util.List;
+import smile.clustering.KMeans;
+import smile.classification.RandomForest;
+import smile.data.DataFrame;
+import smile.data.formula.Formula;
+import smile.data.vector.IntVector;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, SongRecordExtended, String> {
     private transient ListState<SongRecordExtended> buffer;
@@ -23,12 +39,77 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
     @Override
     public void open(Configuration parameters) {
         ListStateDescriptor<SongRecordExtended> descriptor =
-                new ListStateDescriptor<>("countryHitSongs", TypeInformation.of(new TypeHint<>() {}));
+                new ListStateDescriptor<>("countryHitSongs", TypeInformation.of(new TypeHint<>() {
+                }));
         buffer = getRuntimeContext().getListState(descriptor);
 
-        // initialize timerState to keep track of the registered timer
+        // Initialize timerState to keep track of the registered timer
         ValueStateDescriptor<Long> timerDescriptor = new ValueStateDescriptor<>("timerState", Long.class);
         timerState = getRuntimeContext().getState(timerDescriptor);
+    }
+
+    private static void saveModel(RandomForest model, String country) throws IOException {
+        String outputFolder = Main.OUTPUT_PATH + "/models";
+        // Build the full path safely
+        Path path = Paths.get(outputFolder);
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+        Path filePath = Paths.get(outputFolder, country + ".model");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
+            oos.writeObject(model);
+            System.out.println("Model for " + country + " saved as " + filePath + "\n");
+        }
+    }
+
+    public static void saveFeatureImportancesAsJson(RandomForest rf, String country) throws IOException {
+        // Feature names - order matches training input
+        String[] featureNames = new String[] {
+                "explicit",
+                "durationSeconds",
+                "danceability",
+                "energy",
+                "key",
+                "loudness",
+                "mode",
+                "speechiness",
+                "acousticness",
+                "instrumentalness",
+                "liveness",
+                "valence",
+                "tempo",
+                "timeSignature"
+        };
+
+        // Get importances and normalize to percentage
+        double[] importances = rf.importance();
+        double total = Arrays.stream(importances).sum();
+
+        Map<String, Double> featureImportanceMap = new LinkedHashMap<>();
+        for (int i = 0; i < featureNames.length; i++) {
+            double percentage = (importances[i] / total) * 100.0;
+            featureImportanceMap.put(featureNames[i], Math.round(percentage * 100.0) / 100.0); // rounded to 2 decimals
+        }
+
+        // Final object to serialize
+        Map<String, Object> outputMap = new LinkedHashMap<>();
+        outputMap.put("country", country);
+        outputMap.put("featureImportances", featureImportanceMap);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        String outputFolder = Main.OUTPUT_PATH + "/models/feature_importance";
+        Path folderPath = Paths.get(outputFolder);
+        if (!Files.exists(folderPath)) {
+            Files.createDirectories(folderPath);
+        }
+
+        String filename = String.format("feature_importance_%s.json", country);
+        Path outputPath = folderPath.resolve(filename);
+        mapper.writeValue(outputPath.toFile(), outputMap);
+
+        System.out.println("Saved feature importances (JSON) to: " + outputPath.toAbsolutePath());
     }
 
     @Override
@@ -38,7 +119,7 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             Collector<String> out) throws Exception {
         buffer.add(song);
 
-        // register timer only if not already registered
+        // Register timer only if not already registered
         Long currentTimer = timerState.value();
         long now = context.timerService().currentProcessingTime();
         if (currentTimer == null || currentTimer <= now) {
@@ -59,9 +140,10 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             songs.add(record);
         }
 
+        // Clear buffer for the next period
         buffer.clear();
 
-        // clear timer state so next elements can schedule new timers
+        // Clear timer state so next elements can schedule new timers
         timerState.clear();
 
         if (songs.isEmpty() || songs.size() < 2) {
@@ -70,50 +152,111 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
         }
 
         List<double[]> featuresList = new ArrayList<>();
+        List<Integer> labelsList = new ArrayList<>();
+
+        // For KMeans, only train on hit songs
+        List<SongRecordExtended> hitSongs = songs.stream()
+                .filter(SongRecordExtended::isHit)
+                .collect(Collectors.toList());
+
+        // Extract features for hit songs only (for clustering)
+        double[][] hitFeatures = hitSongs.stream()
+                .map(FeatureExtractor::extractFeatures)
+                .toArray(double[][]::new);
+
+        StringBuilder modelsOutput = new StringBuilder()
+                .append("Country: ").append(context.getCurrentKey())
+                .append("\nRecords processed: ").append(songs.size())
+                .append("\n--- ML Models Output ---\n");
+
+        // KMeans
+        if (hitFeatures.length > 0) {
+            applyKMeans(hitFeatures, modelsOutput);
+        } else {
+            modelsOutput.append("\nNo hit songs available for KMeans clustering.\n");
+        }
+
+        // Random Forest
+        // Choose a song for prediction
+        SongRecordExtended sampleSongForPrediction = hitSongs.get(0);
+
+        // Collect "isHit" label for Random Forest
         for (SongRecordExtended song : songs) {
-            featuresList.add(extractFeatures(song));
+            featuresList.add(FeatureExtractor.extractFeatures(song));
+            labelsList.add(song.isHit() ? 1 : 0);
         }
 
         double[][] featureMatrix = featuresList.toArray(new double[0][]);
+        int[] labels = labelsList.stream().mapToInt(i -> i).toArray();
 
-        // Train KMeans model (e.g., 2 clusters)
-        KMeans model = KMeans.fit(featureMatrix, 4);
+        // Only run RF if we have both classes
+        long hitCount = labelsList.stream().filter(l -> l == 1).count();
+        long nonHitCount = labelsList.size() - hitCount;
 
-        // song profiler
-        ProfileHelper profileHelper = new ProfileHelper();
-
-        // Build a profile string reporting cluster centers
-        StringBuilder profile = new StringBuilder();
-        profile.append("Country: ").append(context.getCurrentKey()).append("\n");
-        profile.append("Cluster centroids:\n");
-
-        int clusterIndex = 1;
-        for (double[] centroid : model.centroids) {
-            profile.append("Cluster ").append(clusterIndex++).append(" Summary:\n");
-            profile.append("→ ").append(profileHelper.shortSummary(centroid)).append("\n");
-            profile.append(profileHelper.describeSongProfile(centroid)).append("\n");
+        if (hitCount == 0 || nonHitCount == 0) {
+            modelsOutput.append("\nSkipping RF training: need both hits and non-hits. Hits: ")
+                    .append(hitCount).append(", Non-hits: ").append(nonHitCount).append("\n");
+        } else {
+            applyRandomForest(featureMatrix, labels, sampleSongForPrediction, modelsOutput, context.getCurrentKey());
         }
 
-        out.collect(profile.toString());
+        out.collect(modelsOutput.toString());
     }
 
+    private void applyKMeans(double[][] featureMatrix, StringBuilder profile) {
+        try {
+            // Train KMeans model (e.g., 4 clusters)
+            KMeans modelKMeans = KMeans.fit(featureMatrix, 4);
 
-    private double[] extractFeatures(SongRecordExtended song) {
-        return new double[] {
-                song.isExplicit() ? 1.0 : 0.0,
-                song.getDurationMs() / 1000.0, // converting ms to s
-                song.getDanceability(),
-                song.getEnergy(),
-                song.getKey(),
-                song.getLoudness(),
-                song.getMode(),
-                song.getSpeechiness(),
-                song.getAcousticness(),
-                song.getInstrumentalness(),
-                song.getLiveness(),
-                song.getValence(),
-                song.getTempo(),
-                song.getTimeSignature()
-        };
+            // Song profiler
+            ProfileHelper helper = new ProfileHelper();
+
+            profile.append("\nK-Means Cluster Centroids:\n");
+
+            int clusterIndex = 1;
+            for (double[] centroid : modelKMeans.centroids) {
+                profile.append("Cluster ").append(clusterIndex++).append(":\n→ ")
+                        .append(helper.shortSummary(centroid)).append("\n")
+                        .append(helper.describeSongProfile(centroid)).append("\n");
+            }
+        } catch (Exception e) {
+            profile.append("\nK-Means FAILED");
+        }
+    }
+
+    private void applyRandomForest(double[][] features, int[] labels, SongRecordExtended song, StringBuilder modelsOutput, String country) {
+        try {
+            int numFeatures = features[0].length;
+
+            String[] featureNames = IntStream.range(0, numFeatures)
+                    .mapToObj(i -> "f" + (i + 1))
+                    .toArray(String[]::new);
+
+            DataFrame df = DataFrame.of(features, featureNames).merge(IntVector.of("label", labels));
+            RandomForest rf = RandomForest.fit(Formula.lhs("label"), df);
+
+            modelsOutput.append("\n--- Random Forest Classification ---\n");
+            modelsOutput.append("Trained RF with ").append(numFeatures).append(" features.\n");
+
+            // Test prediction
+            double[][] predictFeatures = new double[][]{FeatureExtractor.extractFeatures(song)};
+            DataFrame predictDf = DataFrame.of(predictFeatures, featureNames)
+                    .merge(IntVector.of("label", new int[]{0}));
+
+            int prediction = rf.predict(predictDf)[0];
+
+            modelsOutput.append("\n--- Prediction Random Forest ---\nSample song: '")
+                    .append(song.getName()).append("' is predicted to be ")
+                    .append(prediction == 1 ? "a HIT." : "not a HIT.").append("\n");
+
+            // Save model
+            saveModel(rf, country);
+
+            // Save importances
+            saveFeatureImportancesAsJson(rf, country);
+        } catch (Exception e) {
+            modelsOutput.append("\nRandom Forest FAILED\n");
+            modelsOutput.append(e.getMessage());
+        }
     }
 }

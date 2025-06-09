@@ -8,8 +8,10 @@ import com.spotify.flink.model.SongRecord;
 import com.spotify.flink.model.SongRecordExtended;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.serialization.SimpleStringEncoder;
+import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.connector.file.sink.FileSink;
 import org.apache.flink.core.fs.Path;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
@@ -21,6 +23,13 @@ import static com.spotify.flink.processor.MarkHitSongs.*;
 import static com.spotify.flink.processor.DataIngestionCleaner.loadAndCleanSongs;
 
 public class BatchHitSongsJob {
+    public static final MapStateDescriptor<String, SongRecordExtended> HIT_SONG_DESCRIPTOR =
+            new MapStateDescriptor<>("hitSongsPerCountry", String.class, SongRecordExtended.class);
+
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
     public static void run() throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -32,40 +41,31 @@ public class BatchHitSongsJob {
                 .keyBy(new SongKeySelector())
                 .process(new HitSongDetector());
 
-        DataStream<String> jsonStream = hitSongs.map(song -> {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            return mapper.writeValueAsString(song);
-        });
+        // Broadcast hit songs with key "country|spotifyId"
+        BroadcastStream<SongRecordExtended> hitBroadcast = hitSongs.broadcast(HIT_SONG_DESCRIPTOR);
 
-        FileSink<String> fileSink = FileSink
+        // Connect and label all songs with hit=true/false
+        DataStream<SongRecordExtended> labeledSongs = songStream
+                .keyBy(new SongKeySelector())
+                .connect(hitBroadcast)
+                .process(new LabelHitSongs());
+
+        // Write output as JSON
+        DataStream<String> labeledJsonStream = labeledSongs.map(song -> mapper.writeValueAsString(song));
+
+        FileSink<String> labeledFileSink = FileSink
                 .forRowFormat(new Path(Main.OUTPUT_PATH), new SimpleStringEncoder<String>("UTF-8"))
                 .withRollingPolicy(DefaultRollingPolicy.builder()
-                    .withRolloverInterval(Duration.ofMinutes(15))
-                    .withInactivityInterval(Duration.ofMinutes(5))
-                    .build())
+                        .withRolloverInterval(Duration.ofMinutes(15))
+                        .withInactivityInterval(Duration.ofMinutes(5))
+                        .build())
                 .build();
 
-        jsonStream.sinkTo(fileSink);
+        labeledJsonStream.sinkTo(labeledFileSink);
 
-//        hitSongs
-//                .keyBy(SongRecordExtended::getCountry)
-//                .process(new CountryHitSongMLProcessor())
-//                .print();
-
-        // Print the results
-//        hitSongs.print();
-
-//        DataStream<SongRecordExtended> roSongs = hitSongs
-//                .filter(song -> song.getCountry().equals("RO"));
-//
-//        roSongs.print(); // This will print only RO records
-
-
-        System.out.println("Starting Flink job...");
+        System.out.println("Starting Flink batch job: Spotify Hit Songs Detection...");
         JobExecutionResult result = env.execute("Spotify Hit Songs Detection");
-        System.out.println("Flink job finished.");
+        System.out.println("Flink batch job finished.");
 
         Long validCountLong = result.getAccumulatorResult(VALID_RECORDS);
         Long parsedCountLong = result.getAccumulatorResult(PARSED_RECORDS);
@@ -75,10 +75,10 @@ public class BatchHitSongsJob {
         long parsedCount = (parsedCountLong != null) ? parsedCountLong : 0L;
         long hitSongsCount = (hitSongsCountLong != null) ? hitSongsCountLong : 0L;
 
-        System.out.println("\n--- Final Aggregated Counts ---");
+        System.out.println("\n--- Final Aggregated Counts (batch job) ---");
         System.out.println("Valid records (non-empty fields): " + validCount);
         System.out.println("Parsed records: " + parsedCount);
-        System.out.println("Hit songs records: " + hitSongsCount);
+        System.out.println("Total distinct hit songs detected: " + hitSongsCount);
         System.out.println("-------------------------------\n");
     }
 }

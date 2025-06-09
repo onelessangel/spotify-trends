@@ -30,13 +30,14 @@ public class StreamingMLJob {
                 .map(new JsonToSongRecordExtendedMapper())
                 .returns(SongRecordExtended.class);
 
-        DataStream<String> profiles = processedHitSongs
+        DataStream<String> profilesAndPredictions = processedHitSongs
                 .keyBy(SongRecordExtended::getCountry)
                 .process(new CountryHitSongMLProcessor());
 
-        profiles.print();
 
-        System.out.println("Starting Flink job...");
+        profilesAndPredictions.print();
+
+        System.out.println("Starting Flink streaming job: Spotify ML Processing...");
         env.execute("Streaming Hit Song ML Processing");
     }
 }

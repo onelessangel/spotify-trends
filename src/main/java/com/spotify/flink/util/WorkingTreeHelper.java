@@ -28,7 +28,7 @@ public class WorkingTreeHelper {
         }
     }
 
-    public static void renameWorkingTree() throws IOException{
+    public static void renameWorkingTree() throws IOException {
         Path parentDir = Paths.get(OUTPUT_PATH);
 
         try (Stream<Path> entries = Files.list(parentDir)) {
@@ -44,6 +44,10 @@ public class WorkingTreeHelper {
                     deleteRecursively(targetDir);
                 }
                 Files.move(onlyDir, targetDir, StandardCopyOption.ATOMIC_MOVE);
+
+                System.out.println("Renamed Flink output directory to: " + targetDir.toAbsolutePath());
+            } else {
+                System.err.println("WARNING: Expected exactly one Flink output directory (starting with 'part-'), but found " + dirs.size());
             }
 
             Path outputDir = parentDir.resolve(OUTPUT_DIR);
@@ -63,6 +67,11 @@ public class WorkingTreeHelper {
                         }
                         Path targetFile = outputDir.resolve(HIT_SONGS_FILE + ext);
                         Files.move(onlyFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                        System.out.println("Renamed Flink output file to: " + targetFile.toAbsolutePath());
+                    } else if (regularFiles.size() > 1) {
+                        System.err.println("WARNING: Expected one output file, but found multiple. Not renaming all.");
+                    } else {
+                        System.err.println("WARNING: No output files found in " + outputDir.toAbsolutePath());
                     }
                 }
             }
@@ -70,18 +79,24 @@ public class WorkingTreeHelper {
     }
 
     private static void deleteRecursively(java.nio.file.Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs)
-                    throws IOException {
-                Files.delete(file);
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                try {
+                    Files.delete(file);
+                } catch (IOException e) {
+                    System.err.println("Could not delete file: " + file + " - " + e.getMessage());
+                }
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(java.nio.file.Path dir, IOException exc)
-                    throws IOException {
-                Files.delete(dir);
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+                try {
+                    Files.delete(dir);
+                } catch (IOException e) {
+                    System.err.println("Could not delete dir: " + dir + " - " + e.getMessage());
+                }
                 return FileVisitResult.CONTINUE;
             }
         });
