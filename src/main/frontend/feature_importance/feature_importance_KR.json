@@ -1,0 +1,19 @@
+{
+  "country" : "KR",
+  "featureImportances" : {
+    "explicit" : 1.23,
+    "durationSeconds" : 10.0,
+    "danceability" : 8.54,
+    "energy" : 9.32,
+    "key" : 4.59,
+    "loudness" : 9.56,
+    "mode" : 0.33,
+    "speechiness" : 10.77,
+    "acousticness" : 10.14,
+    "instrumentalness" : 2.59,
+    "liveness" : 10.49,
+    "valence" : 11.02,
+    "tempo" : 10.35,
+    "timeSignature" : 1.05
+  }
+}

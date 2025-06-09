@@ -1,0 +1,19 @@
+{
+  "country" : "PA",
+  "featureImportances" : {
+    "explicit" : 0.52,
+    "durationSeconds" : 8.39,
+    "danceability" : 10.66,
+    "energy" : 10.58,
+    "key" : 5.05,
+    "loudness" : 8.45,
+    "mode" : 1.14,
+    "speechiness" : 9.81,
+    "acousticness" : 9.57,
+    "instrumentalness" : 6.0,
+    "liveness" : 8.91,
+    "valence" : 11.09,
+    "tempo" : 9.34,
+    "timeSignature" : 0.49
+  }
+}

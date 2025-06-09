@@ -1,0 +1,19 @@
+{
+  "country" : "SK",
+  "featureImportances" : {
+    "explicit" : 0.46,
+    "durationSeconds" : 9.26,
+    "danceability" : 10.82,
+    "energy" : 10.42,
+    "key" : 4.36,
+    "loudness" : 9.38,
+    "mode" : 0.87,
+    "speechiness" : 8.65,
+    "acousticness" : 9.37,
+    "instrumentalness" : 4.32,
+    "liveness" : 9.9,
+    "valence" : 10.47,
+    "tempo" : 11.27,
+    "timeSignature" : 0.45
+  }
+}

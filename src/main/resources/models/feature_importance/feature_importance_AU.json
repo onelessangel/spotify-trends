@@ -1,0 +1,19 @@
+{
+  "country" : "AU",
+  "featureImportances" : {
+    "explicit" : 1.11,
+    "durationSeconds" : 7.6,
+    "danceability" : 9.52,
+    "energy" : 9.23,
+    "key" : 4.98,
+    "loudness" : 10.52,
+    "mode" : 0.35,
+    "speechiness" : 10.98,
+    "acousticness" : 10.16,
+    "instrumentalness" : 4.02,
+    "liveness" : 9.07,
+    "valence" : 11.0,
+    "tempo" : 11.1,
+    "timeSignature" : 0.34
+  }
+}

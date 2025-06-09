@@ -1,0 +1,19 @@
+{
+  "country" : "KZ",
+  "featureImportances" : {
+    "explicit" : 0.53,
+    "durationSeconds" : 10.16,
+    "danceability" : 9.56,
+    "energy" : 9.31,
+    "key" : 4.86,
+    "loudness" : 9.22,
+    "mode" : 0.68,
+    "speechiness" : 9.93,
+    "acousticness" : 9.48,
+    "instrumentalness" : 7.43,
+    "liveness" : 9.61,
+    "valence" : 9.22,
+    "tempo" : 9.4,
+    "timeSignature" : 0.59
+  }
+}

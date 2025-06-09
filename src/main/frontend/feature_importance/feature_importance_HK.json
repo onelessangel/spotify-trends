@@ -1,0 +1,19 @@
+{
+  "country" : "HK",
+  "featureImportances" : {
+    "explicit" : 0.24,
+    "durationSeconds" : 9.67,
+    "danceability" : 8.22,
+    "energy" : 10.37,
+    "key" : 4.37,
+    "loudness" : 10.69,
+    "mode" : 0.49,
+    "speechiness" : 12.12,
+    "acousticness" : 10.13,
+    "instrumentalness" : 3.18,
+    "liveness" : 10.27,
+    "valence" : 9.21,
+    "tempo" : 10.61,
+    "timeSignature" : 0.44
+  }
+}

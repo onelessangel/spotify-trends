@@ -1,0 +1,19 @@
+{
+  "country" : "TH",
+  "featureImportances" : {
+    "explicit" : 0.46,
+    "durationSeconds" : 9.44,
+    "danceability" : 10.52,
+    "energy" : 9.75,
+    "key" : 5.4,
+    "loudness" : 10.29,
+    "mode" : 0.45,
+    "speechiness" : 9.8,
+    "acousticness" : 11.16,
+    "instrumentalness" : 3.96,
+    "liveness" : 9.16,
+    "valence" : 9.78,
+    "tempo" : 9.67,
+    "timeSignature" : 0.18
+  }
+}

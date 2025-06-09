@@ -1,0 +1,19 @@
+{
+  "country" : "UY",
+  "featureImportances" : {
+    "explicit" : 0.96,
+    "durationSeconds" : 7.81,
+    "danceability" : 10.02,
+    "energy" : 10.11,
+    "key" : 5.69,
+    "loudness" : 9.53,
+    "mode" : 0.97,
+    "speechiness" : 9.55,
+    "acousticness" : 10.83,
+    "instrumentalness" : 3.69,
+    "liveness" : 8.99,
+    "valence" : 11.08,
+    "tempo" : 10.42,
+    "timeSignature" : 0.36
+  }
+}

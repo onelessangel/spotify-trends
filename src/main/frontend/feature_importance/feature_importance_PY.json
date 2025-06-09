@@ -1,0 +1,19 @@
+{
+  "country" : "PY",
+  "featureImportances" : {
+    "explicit" : 1.57,
+    "durationSeconds" : 10.63,
+    "danceability" : 9.14,
+    "energy" : 7.85,
+    "key" : 5.12,
+    "loudness" : 9.34,
+    "mode" : 0.79,
+    "speechiness" : 8.9,
+    "acousticness" : 9.01,
+    "instrumentalness" : 5.57,
+    "liveness" : 11.1,
+    "valence" : 10.59,
+    "tempo" : 9.62,
+    "timeSignature" : 0.76
+  }
+}

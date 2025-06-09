@@ -1,0 +1,19 @@
+{
+  "country" : "CH",
+  "featureImportances" : {
+    "explicit" : 0.44,
+    "durationSeconds" : 9.69,
+    "danceability" : 10.76,
+    "energy" : 8.56,
+    "key" : 4.45,
+    "loudness" : 9.48,
+    "mode" : 0.57,
+    "speechiness" : 10.15,
+    "acousticness" : 9.35,
+    "instrumentalness" : 6.6,
+    "liveness" : 9.15,
+    "valence" : 9.64,
+    "tempo" : 10.57,
+    "timeSignature" : 0.59
+  }
+}

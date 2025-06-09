@@ -1,0 +1,19 @@
+{
+  "country" : "SV",
+  "featureImportances" : {
+    "explicit" : 1.28,
+    "durationSeconds" : 8.74,
+    "danceability" : 9.05,
+    "energy" : 9.06,
+    "key" : 5.61,
+    "loudness" : 9.72,
+    "mode" : 0.65,
+    "speechiness" : 10.39,
+    "acousticness" : 8.86,
+    "instrumentalness" : 6.64,
+    "liveness" : 9.96,
+    "valence" : 10.48,
+    "tempo" : 8.92,
+    "timeSignature" : 0.65
+  }
+}

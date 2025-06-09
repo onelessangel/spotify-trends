@@ -1,0 +1,19 @@
+{
+  "country" : "ZA",
+  "featureImportances" : {
+    "explicit" : 0.12,
+    "durationSeconds" : 10.43,
+    "danceability" : 8.83,
+    "energy" : 8.84,
+    "key" : 4.92,
+    "loudness" : 8.34,
+    "mode" : 0.51,
+    "speechiness" : 9.38,
+    "acousticness" : 10.48,
+    "instrumentalness" : 7.88,
+    "liveness" : 10.58,
+    "valence" : 9.89,
+    "tempo" : 9.42,
+    "timeSignature" : 0.36
+  }
+}

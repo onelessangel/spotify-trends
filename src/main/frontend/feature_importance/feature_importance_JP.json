@@ -1,0 +1,19 @@
+{
+  "country" : "JP",
+  "featureImportances" : {
+    "explicit" : 0.07,
+    "durationSeconds" : 11.5,
+    "danceability" : 10.71,
+    "energy" : 7.83,
+    "key" : 6.18,
+    "loudness" : 9.14,
+    "mode" : 0.64,
+    "speechiness" : 10.76,
+    "acousticness" : 9.81,
+    "instrumentalness" : 3.69,
+    "liveness" : 8.78,
+    "valence" : 11.19,
+    "tempo" : 9.62,
+    "timeSignature" : 0.07
+  }
+}

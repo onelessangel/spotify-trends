@@ -1,0 +1,19 @@
+{
+  "country" : "FI",
+  "featureImportances" : {
+    "explicit" : 0.42,
+    "durationSeconds" : 9.25,
+    "danceability" : 10.35,
+    "energy" : 9.93,
+    "key" : 5.01,
+    "loudness" : 9.32,
+    "mode" : 0.63,
+    "speechiness" : 8.19,
+    "acousticness" : 9.48,
+    "instrumentalness" : 7.2,
+    "liveness" : 9.48,
+    "valence" : 11.14,
+    "tempo" : 9.5,
+    "timeSignature" : 0.08
+  }
+}

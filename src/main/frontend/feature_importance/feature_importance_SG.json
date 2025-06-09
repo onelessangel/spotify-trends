@@ -1,0 +1,19 @@
+{
+  "country" : "SG",
+  "featureImportances" : {
+    "explicit" : 0.58,
+    "durationSeconds" : 8.51,
+    "danceability" : 9.95,
+    "energy" : 9.76,
+    "key" : 5.54,
+    "loudness" : 8.33,
+    "mode" : 0.51,
+    "speechiness" : 10.53,
+    "acousticness" : 9.09,
+    "instrumentalness" : 4.93,
+    "liveness" : 9.74,
+    "valence" : 10.62,
+    "tempo" : 11.35,
+    "timeSignature" : 0.56
+  }
+}

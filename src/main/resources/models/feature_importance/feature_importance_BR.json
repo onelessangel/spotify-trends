@@ -1,0 +1,19 @@
+{
+  "country" : "BR",
+  "featureImportances" : {
+    "explicit" : 0.32,
+    "durationSeconds" : 9.86,
+    "danceability" : 9.08,
+    "energy" : 9.77,
+    "key" : 5.19,
+    "loudness" : 10.15,
+    "mode" : 0.77,
+    "speechiness" : 10.81,
+    "acousticness" : 9.99,
+    "instrumentalness" : 3.95,
+    "liveness" : 9.87,
+    "valence" : 10.38,
+    "tempo" : 9.33,
+    "timeSignature" : 0.52
+  }
+}

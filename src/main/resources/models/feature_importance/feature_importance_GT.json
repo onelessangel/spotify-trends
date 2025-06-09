@@ -1,0 +1,19 @@
+{
+  "country" : "GT",
+  "featureImportances" : {
+    "explicit" : 1.64,
+    "durationSeconds" : 10.06,
+    "danceability" : 7.83,
+    "energy" : 9.42,
+    "key" : 4.95,
+    "loudness" : 10.76,
+    "mode" : 0.96,
+    "speechiness" : 9.1,
+    "acousticness" : 9.39,
+    "instrumentalness" : 6.65,
+    "liveness" : 9.06,
+    "valence" : 9.53,
+    "tempo" : 9.41,
+    "timeSignature" : 1.25
+  }
+}

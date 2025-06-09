@@ -1,0 +1,19 @@
+{
+  "country" : "EC",
+  "featureImportances" : {
+    "explicit" : 1.38,
+    "durationSeconds" : 8.39,
+    "danceability" : 7.55,
+    "energy" : 9.05,
+    "key" : 5.32,
+    "loudness" : 9.26,
+    "mode" : 1.12,
+    "speechiness" : 9.13,
+    "acousticness" : 10.36,
+    "instrumentalness" : 6.91,
+    "liveness" : 10.2,
+    "valence" : 10.69,
+    "tempo" : 9.49,
+    "timeSignature" : 1.14
+  }
+}

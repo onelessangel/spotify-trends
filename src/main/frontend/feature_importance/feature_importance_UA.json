@@ -1,0 +1,19 @@
+{
+  "country" : "UA",
+  "featureImportances" : {
+    "explicit" : 0.75,
+    "durationSeconds" : 9.24,
+    "danceability" : 8.43,
+    "energy" : 9.82,
+    "key" : 5.37,
+    "loudness" : 9.02,
+    "mode" : 0.38,
+    "speechiness" : 9.55,
+    "acousticness" : 9.37,
+    "instrumentalness" : 6.23,
+    "liveness" : 9.28,
+    "valence" : 12.86,
+    "tempo" : 9.59,
+    "timeSignature" : 0.12
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "TW",
+  "featureImportances" : {
+    "explicit" : 0.12,
+    "durationSeconds" : 9.77,
+    "danceability" : 9.35,
+    "energy" : 10.03,
+    "key" : 5.1,
+    "loudness" : 9.01,
+    "mode" : 0.55,
+    "speechiness" : 10.73,
+    "acousticness" : 12.34,
+    "instrumentalness" : 3.71,
+    "liveness" : 9.32,
+    "valence" : 9.13,
+    "tempo" : 10.39,
+    "timeSignature" : 0.46
+  }
+}

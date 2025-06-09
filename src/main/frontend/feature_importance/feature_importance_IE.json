@@ -1,0 +1,19 @@
+{
+  "country" : "IE",
+  "featureImportances" : {
+    "explicit" : 0.55,
+    "durationSeconds" : 8.31,
+    "danceability" : 10.03,
+    "energy" : 9.32,
+    "key" : 4.14,
+    "loudness" : 10.13,
+    "mode" : 0.5,
+    "speechiness" : 9.9,
+    "acousticness" : 9.93,
+    "instrumentalness" : 5.49,
+    "liveness" : 9.64,
+    "valence" : 10.58,
+    "tempo" : 10.69,
+    "timeSignature" : 0.79
+  }
+}

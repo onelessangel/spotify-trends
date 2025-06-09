@@ -1,0 +1,19 @@
+{
+  "country" : "ES",
+  "featureImportances" : {
+    "explicit" : 0.28,
+    "durationSeconds" : 8.45,
+    "danceability" : 9.87,
+    "energy" : 9.95,
+    "key" : 5.48,
+    "loudness" : 8.77,
+    "mode" : 0.52,
+    "speechiness" : 9.74,
+    "acousticness" : 10.07,
+    "instrumentalness" : 5.83,
+    "liveness" : 9.75,
+    "valence" : 10.78,
+    "tempo" : 10.0,
+    "timeSignature" : 0.51
+  }
+}

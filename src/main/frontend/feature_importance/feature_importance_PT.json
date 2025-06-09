@@ -1,0 +1,19 @@
+{
+  "country" : "PT",
+  "featureImportances" : {
+    "explicit" : 0.51,
+    "durationSeconds" : 8.93,
+    "danceability" : 9.77,
+    "energy" : 8.95,
+    "key" : 5.07,
+    "loudness" : 9.98,
+    "mode" : 0.58,
+    "speechiness" : 9.7,
+    "acousticness" : 9.15,
+    "instrumentalness" : 6.92,
+    "liveness" : 9.2,
+    "valence" : 10.02,
+    "tempo" : 10.11,
+    "timeSignature" : 1.11
+  }
+}

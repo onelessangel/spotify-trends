@@ -1,0 +1,19 @@
+{
+  "country" : "NZ",
+  "featureImportances" : {
+    "explicit" : 0.9,
+    "durationSeconds" : 7.62,
+    "danceability" : 8.83,
+    "energy" : 9.0,
+    "key" : 4.22,
+    "loudness" : 10.43,
+    "mode" : 0.58,
+    "speechiness" : 9.98,
+    "acousticness" : 10.54,
+    "instrumentalness" : 5.84,
+    "liveness" : 10.58,
+    "valence" : 10.39,
+    "tempo" : 10.51,
+    "timeSignature" : 0.57
+  }
+}

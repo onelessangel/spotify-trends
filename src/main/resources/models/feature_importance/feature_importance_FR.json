@@ -1,0 +1,19 @@
+{
+  "country" : "FR",
+  "featureImportances" : {
+    "explicit" : 1.04,
+    "durationSeconds" : 9.32,
+    "danceability" : 9.75,
+    "energy" : 9.61,
+    "key" : 3.92,
+    "loudness" : 9.85,
+    "mode" : 0.51,
+    "speechiness" : 9.4,
+    "acousticness" : 10.1,
+    "instrumentalness" : 4.95,
+    "liveness" : 9.01,
+    "valence" : 12.04,
+    "tempo" : 9.76,
+    "timeSignature" : 0.74
+  }
+}

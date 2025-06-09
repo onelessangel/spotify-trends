@@ -1,0 +1,19 @@
+{
+  "country" : "HU",
+  "featureImportances" : {
+    "explicit" : 0.56,
+    "durationSeconds" : 9.02,
+    "danceability" : 10.93,
+    "energy" : 9.58,
+    "key" : 4.89,
+    "loudness" : 9.67,
+    "mode" : 0.34,
+    "speechiness" : 10.58,
+    "acousticness" : 10.11,
+    "instrumentalness" : 4.94,
+    "liveness" : 9.29,
+    "valence" : 9.79,
+    "tempo" : 9.84,
+    "timeSignature" : 0.45
+  }
+}

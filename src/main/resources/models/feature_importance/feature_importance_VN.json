@@ -1,0 +1,19 @@
+{
+  "country" : "VN",
+  "featureImportances" : {
+    "explicit" : 0.9,
+    "durationSeconds" : 9.55,
+    "danceability" : 8.65,
+    "energy" : 10.09,
+    "key" : 4.54,
+    "loudness" : 11.09,
+    "mode" : 0.81,
+    "speechiness" : 10.02,
+    "acousticness" : 10.32,
+    "instrumentalness" : 4.37,
+    "liveness" : 9.1,
+    "valence" : 10.22,
+    "tempo" : 10.25,
+    "timeSignature" : 0.09
+  }
+}

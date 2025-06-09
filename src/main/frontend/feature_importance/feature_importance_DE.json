@@ -1,0 +1,19 @@
+{
+  "country" : "DE",
+  "featureImportances" : {
+    "explicit" : 0.87,
+    "durationSeconds" : 9.27,
+    "danceability" : 9.65,
+    "energy" : 9.79,
+    "key" : 4.08,
+    "loudness" : 10.01,
+    "mode" : 0.41,
+    "speechiness" : 9.75,
+    "acousticness" : 8.96,
+    "instrumentalness" : 6.31,
+    "liveness" : 10.51,
+    "valence" : 9.87,
+    "tempo" : 9.96,
+    "timeSignature" : 0.57
+  }
+}

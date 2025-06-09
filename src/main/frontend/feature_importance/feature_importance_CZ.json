@@ -1,0 +1,19 @@
+{
+  "country" : "CZ",
+  "featureImportances" : {
+    "explicit" : 0.75,
+    "durationSeconds" : 13.96,
+    "danceability" : 9.33,
+    "energy" : 9.32,
+    "key" : 4.88,
+    "loudness" : 8.43,
+    "mode" : 0.62,
+    "speechiness" : 9.58,
+    "acousticness" : 8.65,
+    "instrumentalness" : 4.3,
+    "liveness" : 10.02,
+    "valence" : 10.49,
+    "tempo" : 8.98,
+    "timeSignature" : 0.68
+  }
+}

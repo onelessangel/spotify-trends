@@ -1,0 +1,19 @@
+{
+  "country" : "BO",
+  "featureImportances" : {
+    "explicit" : 0.96,
+    "durationSeconds" : 7.72,
+    "danceability" : 9.8,
+    "energy" : 9.86,
+    "key" : 6.57,
+    "loudness" : 9.13,
+    "mode" : 0.87,
+    "speechiness" : 9.8,
+    "acousticness" : 10.72,
+    "instrumentalness" : 5.37,
+    "liveness" : 9.65,
+    "valence" : 9.18,
+    "tempo" : 9.52,
+    "timeSignature" : 0.83
+  }
+}

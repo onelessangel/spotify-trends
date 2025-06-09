@@ -1,0 +1,19 @@
+{
+  "country" : "BG",
+  "featureImportances" : {
+    "explicit" : 0.34,
+    "durationSeconds" : 8.02,
+    "danceability" : 10.67,
+    "energy" : 8.85,
+    "key" : 5.36,
+    "loudness" : 10.02,
+    "mode" : 1.16,
+    "speechiness" : 8.89,
+    "acousticness" : 10.76,
+    "instrumentalness" : 5.47,
+    "liveness" : 9.86,
+    "valence" : 9.03,
+    "tempo" : 10.95,
+    "timeSignature" : 0.63
+  }
+}

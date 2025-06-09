@@ -1,0 +1,19 @@
+{
+  "country" : "AT",
+  "featureImportances" : {
+    "explicit" : 0.39,
+    "durationSeconds" : 9.14,
+    "danceability" : 10.02,
+    "energy" : 8.76,
+    "key" : 4.54,
+    "loudness" : 9.05,
+    "mode" : 0.45,
+    "speechiness" : 9.3,
+    "acousticness" : 8.94,
+    "instrumentalness" : 6.75,
+    "liveness" : 9.54,
+    "valence" : 10.49,
+    "tempo" : 12.13,
+    "timeSignature" : 0.49
+  }
+}

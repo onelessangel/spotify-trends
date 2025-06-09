@@ -1,0 +1,19 @@
+{
+  "country" : "BE",
+  "featureImportances" : {
+    "explicit" : 0.87,
+    "durationSeconds" : 8.62,
+    "danceability" : 9.16,
+    "energy" : 8.52,
+    "key" : 5.13,
+    "loudness" : 9.6,
+    "mode" : 0.7,
+    "speechiness" : 9.15,
+    "acousticness" : 10.85,
+    "instrumentalness" : 4.55,
+    "liveness" : 9.54,
+    "valence" : 9.18,
+    "tempo" : 13.56,
+    "timeSignature" : 0.58
+  }
+}

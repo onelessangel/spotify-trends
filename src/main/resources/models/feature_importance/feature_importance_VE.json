@@ -1,0 +1,19 @@
+{
+  "country" : "VE",
+  "featureImportances" : {
+    "explicit" : 0.75,
+    "durationSeconds" : 9.37,
+    "danceability" : 9.42,
+    "energy" : 9.92,
+    "key" : 5.26,
+    "loudness" : 9.5,
+    "mode" : 0.44,
+    "speechiness" : 9.12,
+    "acousticness" : 10.76,
+    "instrumentalness" : 6.54,
+    "liveness" : 9.26,
+    "valence" : 10.09,
+    "tempo" : 8.63,
+    "timeSignature" : 0.93
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "DO",
+  "featureImportances" : {
+    "explicit" : 0.42,
+    "durationSeconds" : 9.19,
+    "danceability" : 10.44,
+    "energy" : 9.95,
+    "key" : 5.64,
+    "loudness" : 9.91,
+    "mode" : 0.51,
+    "speechiness" : 10.24,
+    "acousticness" : 8.66,
+    "instrumentalness" : 6.23,
+    "liveness" : 9.99,
+    "valence" : 9.0,
+    "tempo" : 8.61,
+    "timeSignature" : 1.22
+  }
+}

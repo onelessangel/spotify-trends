@@ -1,0 +1,19 @@
+{
+  "country" : "MA",
+  "featureImportances" : {
+    "explicit" : 0.68,
+    "durationSeconds" : 9.24,
+    "danceability" : 9.0,
+    "energy" : 9.11,
+    "key" : 5.09,
+    "loudness" : 11.09,
+    "mode" : 0.64,
+    "speechiness" : 9.36,
+    "acousticness" : 9.12,
+    "instrumentalness" : 7.28,
+    "liveness" : 10.9,
+    "valence" : 9.16,
+    "tempo" : 8.41,
+    "timeSignature" : 0.93
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "NG",
+  "featureImportances" : {
+    "explicit" : 0.37,
+    "durationSeconds" : 8.05,
+    "danceability" : 10.47,
+    "energy" : 9.73,
+    "key" : 4.55,
+    "loudness" : 9.09,
+    "mode" : 0.62,
+    "speechiness" : 10.52,
+    "acousticness" : 9.11,
+    "instrumentalness" : 8.07,
+    "liveness" : 10.3,
+    "valence" : 9.26,
+    "tempo" : 9.34,
+    "timeSignature" : 0.52
+  }
+}

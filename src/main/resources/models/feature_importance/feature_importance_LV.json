@@ -1,0 +1,19 @@
+{
+  "country" : "LV",
+  "featureImportances" : {
+    "explicit" : 0.43,
+    "durationSeconds" : 8.13,
+    "danceability" : 10.26,
+    "energy" : 10.61,
+    "key" : 4.03,
+    "loudness" : 9.51,
+    "mode" : 0.87,
+    "speechiness" : 9.78,
+    "acousticness" : 8.58,
+    "instrumentalness" : 5.87,
+    "liveness" : 10.44,
+    "valence" : 11.44,
+    "tempo" : 9.59,
+    "timeSignature" : 0.47
+  }
+}

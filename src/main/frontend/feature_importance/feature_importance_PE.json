@@ -1,0 +1,19 @@
+{
+  "country" : "PE",
+  "featureImportances" : {
+    "explicit" : 1.32,
+    "durationSeconds" : 9.49,
+    "danceability" : 8.75,
+    "energy" : 10.38,
+    "key" : 4.96,
+    "loudness" : 9.57,
+    "mode" : 0.65,
+    "speechiness" : 9.06,
+    "acousticness" : 9.99,
+    "instrumentalness" : 6.1,
+    "liveness" : 9.19,
+    "valence" : 9.53,
+    "tempo" : 10.15,
+    "timeSignature" : 0.84
+  }
+}

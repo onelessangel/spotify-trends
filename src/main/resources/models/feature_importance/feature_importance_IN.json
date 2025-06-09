@@ -1,0 +1,19 @@
+{
+  "country" : "IN",
+  "featureImportances" : {
+    "explicit" : 0.66,
+    "durationSeconds" : 6.81,
+    "danceability" : 10.63,
+    "energy" : 9.92,
+    "key" : 6.18,
+    "loudness" : 11.13,
+    "mode" : 1.03,
+    "speechiness" : 8.87,
+    "acousticness" : 9.87,
+    "instrumentalness" : 4.73,
+    "liveness" : 8.48,
+    "valence" : 10.45,
+    "tempo" : 10.13,
+    "timeSignature" : 1.12
+  }
+}

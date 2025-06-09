@@ -1,0 +1,19 @@
+{
+  "country" : "NL",
+  "featureImportances" : {
+    "explicit" : 0.33,
+    "durationSeconds" : 9.6,
+    "danceability" : 9.44,
+    "energy" : 10.13,
+    "key" : 4.0,
+    "loudness" : 10.62,
+    "mode" : 0.73,
+    "speechiness" : 9.07,
+    "acousticness" : 10.25,
+    "instrumentalness" : 4.25,
+    "liveness" : 10.28,
+    "valence" : 10.05,
+    "tempo" : 10.74,
+    "timeSignature" : 0.5
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "country" : "LU",
+  "featureImportances" : {
+    "explicit" : 0.33,
+    "durationSeconds" : 9.08,
+    "danceability" : 8.37,
+    "energy" : 9.25,
+    "key" : 4.38,
+    "loudness" : 9.61,
+    "mode" : 0.39,
+    "speechiness" : 10.32,
+    "acousticness" : 9.38,
+    "instrumentalness" : 5.46,
+    "liveness" : 10.31,
+    "valence" : 11.0,
+    "tempo" : 11.3,
+    "timeSignature" : 0.83
+  }
+}

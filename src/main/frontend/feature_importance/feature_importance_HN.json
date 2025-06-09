@@ -1,0 +1,19 @@
+{
+  "country" : "HN",
+  "featureImportances" : {
+    "explicit" : 1.74,
+    "durationSeconds" : 9.18,
+    "danceability" : 9.51,
+    "energy" : 11.34,
+    "key" : 5.81,
+    "loudness" : 8.98,
+    "mode" : 0.77,
+    "speechiness" : 9.16,
+    "acousticness" : 8.35,
+    "instrumentalness" : 6.89,
+    "liveness" : 8.6,
+    "valence" : 9.33,
+    "tempo" : 9.32,
+    "timeSignature" : 1.02
+  }
+}
