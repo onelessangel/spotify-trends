@@ -1,5 +1,7 @@
 package com.spotify.flink.processor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.spotify.flink.Main;
 import com.spotify.flink.model.SongRecordExtended;
 import com.spotify.flink.util.ProfileHelper;
@@ -26,8 +28,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -59,6 +60,52 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             oos.writeObject(model);
             System.out.println("Model for " + country + " saved as " + filePath + "\n");
         }
+    }
+
+    public static void saveFeatureImportancesAsJson(RandomForest rf, String country) throws IOException {
+        // Feature names - order matches training input
+        String[] featureNames = new String[] {
+                "explicit",
+                "durationSeconds",
+                "danceability",
+                "energy",
+                "key",
+                "loudness",
+                "mode",
+                "speechiness",
+                "acousticness",
+                "instrumentalness",
+                "liveness",
+                "valence",
+                "tempo",
+                "timeSignature"
+        };
+
+        // Get importances and normalize to percentage
+        double[] importances = rf.importance();
+        double total = Arrays.stream(importances).sum();
+
+        Map<String, Double> featureImportanceMap = new LinkedHashMap<>();
+        for (int i = 0; i < featureNames.length; i++) {
+            double percentage = (importances[i] / total) * 100.0;
+            featureImportanceMap.put(featureNames[i], Math.round(percentage * 100.0) / 100.0); // rounded to 2 decimals
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        String outputFolder = Main.OUTPUT_PATH + "/models/feature_importance";
+        Path folderPath = Paths.get(outputFolder);
+        if (!Files.exists(folderPath)) {
+            Files.createDirectories(folderPath);
+        }
+
+        // Write JSON file
+        String filename = String.format("feature_importance_%s.json", country);
+        Path outputPath = folderPath.resolve(filename);
+        mapper.writeValue(outputPath.toFile(), featureImportanceMap);
+
+        System.out.println("Saved feature importances (JSON) to: " + outputPath.toAbsolutePath());
     }
 
     @Override
@@ -200,6 +247,9 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
 
             // Save model
             saveModel(rf, country);
+
+            // Save importances
+            saveFeatureImportancesAsJson(rf, country);
         } catch (Exception e) {
             modelsOutput.append("\nRandom Forest FAILED\n");
             modelsOutput.append(e.getMessage());
