@@ -91,6 +91,11 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             featureImportanceMap.put(featureNames[i], Math.round(percentage * 100.0) / 100.0); // rounded to 2 decimals
         }
 
+        // Final object to serialize
+        Map<String, Object> outputMap = new LinkedHashMap<>();
+        outputMap.put("country", country);
+        outputMap.put("featureImportances", featureImportanceMap);
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -100,10 +105,9 @@ public class CountryHitSongMLProcessor extends KeyedProcessFunction<String, Song
             Files.createDirectories(folderPath);
         }
 
-        // Write JSON file
         String filename = String.format("feature_importance_%s.json", country);
         Path outputPath = folderPath.resolve(filename);
-        mapper.writeValue(outputPath.toFile(), featureImportanceMap);
+        mapper.writeValue(outputPath.toFile(), outputMap);
 
         System.out.println("Saved feature importances (JSON) to: " + outputPath.toAbsolutePath());
     }
