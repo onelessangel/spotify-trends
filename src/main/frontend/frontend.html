@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hit Song Characteristics Importance by Country</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="countryFiles.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 1px 1px 2px #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #submit {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #submit:hover {
+            background-color: #45a049;
+        }
+
+        #reset {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #reset:hover {
+            background-color: #d32f2f;
+        }
+
+        #details, #characteristics, #chart-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Hit Song Characteristics by Country</h1>
+
+<div id="country-table"></div>
+
+<button id="submit">Submit</button>
+<button id="reset" class="hidden">Reset</button>
+
+<div id="details" class="hidden"></div>
+
+<div id="characteristics" class="hidden"></div>
+
+<div id="chart-container" class="hidden">
+    <canvas id="chart" width="400" height="200"></canvas>
+</div>
+
+<script>
+    let availableCountries = [];
+    let countryData = {};
+    const submitBtn = document.getElementById('submit');
+    const resetBtn = document.getElementById('reset');
+    const countryTableDiv = document.getElementById('country-table');
+    const detailsDiv = document.getElementById('details');
+    const characteristicsDiv = document.getElementById('characteristics');
+    const chartContainer = document.getElementById('chart-container');
+    let selectedCountries = [];
+    let chartInstance = null;
+
+    async function loadCountries() {
+        availableCountries = [];
+        countryData = {};
+
+        for (const file of countryFiles) {
+            const response = await fetch(file);
+            const json = await response.json();
+
+            const countryCode = json.country;
+            availableCountries.push(countryCode);
+            countryData[countryCode] = json.featureImportances;
+        }
+
+        generateCountryTable();
+    }
+
+    function generateCountryTable() {
+        let html = '<table><thead><tr><th>Country</th><th>Select</th></tr></thead><tbody>';
+        availableCountries.forEach(code => {
+            html += `<tr><td>${code}</td><td><input type="checkbox" value="${code}"></td></tr>`;
+        });
+        html += '</tbody></table>';
+        countryTableDiv.innerHTML = html;
+    }
+
+    submitBtn.addEventListener('click', async () => {
+        if (characteristicsDiv.classList.contains('hidden')) {
+            selectedCountries = Array.from(document.querySelectorAll('#country-table input[type="checkbox"]:checked')).map(cb => cb.value);
+
+            if (selectedCountries.length === 0) {
+                alert('Please select at least one country.');
+                return;
+            }
+
+            resetBtn.classList.remove('hidden');
+            countryTableDiv.classList.add('hidden');
+
+            if (selectedCountries.length === 1) {
+                showSingleCountryDetails();
+            } else {
+                detailsDiv.classList.add('hidden');
+                chartContainer.classList.add('hidden');
+                generateCharacteristicsTable();
+            }
+        } else {
+            const selectedCharacteristic = document.querySelector('input[name="characteristic"]:checked');
+            if (!selectedCharacteristic) {
+                alert('Please select a characteristic.');
+                return;
+            }
+            drawChart(selectedCountries, selectedCharacteristic.value);
+        }
+    });
+
+    function showSingleCountryDetails() {
+        detailsDiv.classList.remove('hidden');
+        characteristicsDiv.classList.add('hidden');
+        chartContainer.classList.add('hidden');
+
+        const country = selectedCountries[0];
+        const data = countryData[country];
+        detailsDiv.innerHTML = `<h2>${country}</h2>` +
+            Object.entries(data).map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`).join('');
+    }
+
+    function generateCharacteristicsTable() {
+        const characteristics = Object.keys(countryData[selectedCountries[0]]);
+
+        let html = '<table><thead><tr><th>Characteristic</th><th>Select</th></tr></thead><tbody>';
+        characteristics.forEach(c => {
+            html += `<tr><td>${c}</td><td><input type="radio" name="characteristic" value="${c}"></td></tr>`;
+        });
+        html += '</tbody></table>';
+
+        characteristicsDiv.innerHTML = html;
+        characteristicsDiv.classList.remove('hidden');
+    }
+
+    function drawChart(countries, characteristic) {
+        const ctx = document.getElementById('chart').getContext('2d');
+
+        const values = countries.map(country => countryData[country][characteristic]);
+
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: countries,
+                datasets: [{
+                    label: characteristic,
+                    data: values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        chartContainer.classList.remove('hidden');
+    }
+
+    resetBtn.addEventListener('click', () => {
+        document.querySelectorAll('#country-table input[type="checkbox"]').forEach(cb => cb.checked = false);
+        countryTableDiv.classList.remove('hidden');
+        detailsDiv.classList.add('hidden');
+        characteristicsDiv.classList.add('hidden');
+        chartContainer.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+    });
+
+    loadCountries();
+</script>
+
+</body>
+</html>
+
