@@ -5,38 +5,61 @@
     <title>Hit Song Characteristics Importance by Country</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="countryFiles.js"></script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            background-color: #191414;
             padding: 20px;
-            color: #333;
+            color: white;
         }
 
         h1 {
             text-align: center;
-            color: #fff;
-            text-shadow: 1px 1px 2px #555;
+            color: #1DB954;
+            margin-bottom: 10px;
+        }
+
+        .spotify-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .spotify-header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+            font-size: 16px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
+            margin-top: 10px;
+            background-color: #282828;
             border-radius: 10px;
             overflow: hidden;
+            color: white;
         }
 
         th, td {
             padding: 10px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #444;
         }
 
         th {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #1DB954;
+            color: black;
         }
 
         button {
@@ -46,16 +69,11 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
         #submit {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        #submit:hover {
-            background-color: #45a049;
+            background-color: #1DB954;
+            color: black;
         }
 
         #reset {
@@ -63,16 +81,19 @@
             color: white;
         }
 
+        #submit:hover {
+            background-color: #1aa34a;
+        }
+
         #reset:hover {
             background-color: #d32f2f;
         }
 
         #details, #characteristics, #chart-container {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: #282828;
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .hidden {
@@ -82,12 +103,18 @@
         p {
             font-size: 16px;
             line-height: 1.5;
+            color: white;
         }
     </style>
 </head>
 <body>
 
-<h1>Hit Song Characteristics by Country</h1>
+<div class="spotify-header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg" alt="Spotify Logo">
+    <h1>Hit Song Characteristics by Country</h1>
+</div>
+
+<input type="text" id="search" placeholder="Search countries...">
 
 <div id="country-table"></div>
 
@@ -129,6 +156,17 @@
 
         generateCountryTable();
     }
+
+    document.getElementById('search').addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#country-table tbody tr');
+
+        rows.forEach(row => {
+            const country = row.cells[0].textContent.toLowerCase();
+            row.style.display = country.includes(searchText) ? '' : 'none';
+        });
+    });
+
 
     function generateCountryTable() {
         let html = '<table><thead><tr><th>Country</th><th>Select</th></tr></thead><tbody>';
@@ -208,15 +246,40 @@
                 datasets: [{
                     label: characteristic,
                     data: values,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: '#1DB954',
+                    borderColor: '#1DB954',
                     borderWidth: 1
                 }]
             },
             options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white' // Legend text
+                        }
+                    },
+                    tooltip: {
+                        bodyColor: 'white',
+                        titleColor: 'white'
+                    }
+                },
                 scales: {
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: '#444'
+                        }
+                    },
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: '#444'
+                        }
                     }
                 }
             }
@@ -243,4 +306,3 @@
 
 </body>
 </html>
-
